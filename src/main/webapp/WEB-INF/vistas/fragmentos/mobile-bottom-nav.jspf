@@ -1,0 +1,89 @@
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:set var="activePage" value="${fn:toLowerCase(pageContext.request.requestURI.toString())}" />
+
+<style>
+    /* =============================================
+       NAVEGACIÓN MÓVIL (Bottom Bar)
+    ============================================= */
+    .nav-movil {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(14px);
+        border-top: 1px solid var(--color-borde);
+        box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+        z-index: 100;
+        padding: 0 8px;
+    }
+
+    .nav-movil-inner {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    .nav-movil-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 6px 12px;
+        border-radius: 12px;
+        color: var(--color-texto-suave);
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color .2s ease, background .2s ease;
+    }
+
+    .nav-movil-link:hover,
+    .nav-movil-link.activo {
+        color: var(--color-celeste);
+        background: rgba(1, 186, 239, 0.08);
+    }
+
+    .nav-movil-link.activo {
+        color: var(--color-azul-oscuro);
+    }
+
+    @media (max-width: 768px) {
+        .nav-movil  { display: block; }
+        body        { padding-bottom: 72px; }
+    }
+</style>
+
+<nav class="nav-movil" aria-label="Navegación móvil">
+    <div class="nav-movil-inner">
+
+        <a href="${pageContext.request.contextPath}/dashboard"
+           class="nav-movil-link ${activePage.contains('dashboard') ? 'activo' : ''}">
+            <i data-lucide="layout-dashboard" style="width:24px;height:24px;"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="${pageContext.request.contextPath}/explore"
+           class="nav-movil-link ${activePage.contains('explore') ? 'activo' : ''}">
+            <i data-lucide="search" style="width:24px;height:24px;"></i>
+            <span>Explorar</span>
+        </a>
+
+        <a href="${pageContext.request.contextPath}/my-courses"
+           class="nav-movil-link ${activePage.contains('my-courses') ? 'activo' : ''}">
+            <i data-lucide="book-marked" style="width:24px;height:24px;"></i>
+            <span>Cursos</span>
+        </a>
+
+        <a href="${pageContext.request.contextPath}/matches"
+           class="nav-movil-link ${activePage.contains('matches') ? 'activo' : ''}">
+            <i data-lucide="users" style="width:24px;height:24px;"></i>
+            <span>Matches</span>
+        </a>
+
+    </div>
+</nav>

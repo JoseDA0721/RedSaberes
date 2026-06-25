@@ -1,0 +1,208 @@
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:set var="activePage"          value="${fn:toLowerCase(pageContext.request.requestURI.toString())}" />
+
+<style>
+    /* =============================================
+       NAVEGACIÓN PRINCIPAL
+    ============================================= */
+    .nav-principal {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        height: var(--nav-alto);
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--color-borde);
+        box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+    }
+
+    .nav-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+    }
+
+    /* --- Logo --- */
+    .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+
+    .nav-logo-icono {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: var(--gradiente-marca);
+        display: grid;
+        place-items: center;
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(1, 186, 239, 0.28);
+    }
+
+    .nav-logo-texto {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        background: var(--gradiente-marca);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* --- Links de navegación --- */
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .nav-link {
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--color-texto-suave);
+        transition: color .2s ease, background .2s ease;
+        text-decoration: none;
+    }
+
+    .nav-link:hover,
+    .nav-link.activo {
+        color: var(--color-azul-oscuro);
+        background: rgba(1, 186, 239, 0.08);
+    }
+
+    .nav-link.activo {
+        color: var(--color-celeste);
+        border-bottom: 2px solid var(--color-celeste);
+        border-radius: 8px 8px 0 0;
+    }
+
+    /* --- Acciones derecha --- */
+    .nav-acciones {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* --- Perfil --- */
+    .nav-perfil {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        padding: 4px 10px 4px 4px;
+        border-radius: 12px;
+        transition: background .2s ease;
+    }
+
+    .nav-perfil:hover { background: rgba(1, 186, 239, 0.08); }
+
+    .nav-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--gradiente-marca);
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(1, 186, 239, 0.25);
+    }
+
+    .nav-perfil-info { display: none; }
+
+    @media (min-width: 769px) {
+        .nav-perfil-info { display: block; }
+    }
+
+    .nav-perfil-nombre {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--color-texto);
+        line-height: 1.2;
+    }
+
+    .nav-perfil-email {
+        font-size: 11px;
+        color: var(--color-texto-suave);
+    }
+
+    /* --- Botón logout --- */
+    .nav-logout {
+        width: 38px;
+        height: 38px;
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--color-texto-suave);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: background .2s ease, color .2s ease;
+        text-decoration: none;
+    }
+
+    .nav-logout:hover {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+    /* --- Desktop nav hidden on mobile --- */
+    @media (max-width: 768px) {
+        .nav-links { display: none; }
+    }
+</style>
+
+<nav class="nav-principal" aria-label="Navegación principal">
+    <div class="nav-inner">
+
+        <!-- Logo -->
+        <a href="${pageContext.request.contextPath}/dashboard" class="nav-logo">
+            <div class="nav-logo-icono">
+                <i data-lucide="book-open" style="width:22px;height:22px;"></i>
+            </div>
+            <span class="nav-logo-texto">RedSaberes</span>
+        </a>
+
+        <!-- Links (desktop) -->
+        <nav class="nav-links" aria-label="Menú principal">
+            <a href="${pageContext.request.contextPath}/dashboard"
+               class="nav-link ${activePage.contains('dashboard') ? 'activo' : ''}">Dashboard</a>
+
+            <a href="${pageContext.request.contextPath}/my-courses"
+               class="nav-link ${activePage.contains('my-courses') ? 'activo' : ''}">Mis Cursos</a>
+        </nav>
+
+        <!-- Acciones derecha -->
+        <div class="nav-acciones">
+
+            <!-- Perfil -->
+            <a href="${pageContext.request.contextPath}/profile/edit" class="nav-perfil" title="Editar perfil">
+                <div class="nav-avatar">
+                    ${sessionScope.userName.substring(0, 1).toUpperCase()}
+                </div>
+                <div class="nav-perfil-info">
+                    <div class="nav-perfil-nombre">${sessionScope.userName}</div>
+                    <div class="nav-perfil-email">${sessionScope.userEmail}</div>
+                </div>
+            </a>
+
+            <!-- Logout -->
+            <a href="${pageContext.request.contextPath}/logout" class="nav-logout" title="Cerrar sesión" aria-label="Cerrar sesión">
+                <i data-lucide="log-out" style="width:20px;height:20px;"></i>
+            </a>
+        </div>
+    </div>
+</nav>

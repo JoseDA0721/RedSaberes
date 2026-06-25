@@ -1,0 +1,9 @@
+CREATE TABLE usuarios (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    nombres NVARCHAR(255) NOT NULL,
+    apellidos NVARCHAR(255) NULL,
+    correo NVARCHAR(255) NOT NULL UNIQUE,
+    password_hash NVARCHAR(255) NOT NULL,
+    fecha_registro DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    estado BIT NOT NULL DEFAULT 1
+);
