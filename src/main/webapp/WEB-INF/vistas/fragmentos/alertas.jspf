@@ -1,0 +1,37 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<style>
+    .alerta {
+        margin-bottom: 20px;
+        padding: 12px 14px;
+        border-radius: var(--radio-pequeno);
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.4;
+        border: 1px solid transparent;
+    }
+
+    .alerta-error {
+        color: #991b1b;
+        background: #fef2f2;
+        border-color: #fecaca;
+    }
+
+    .alerta-exito {
+        color: #166534;
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+</style>
+
+<c:if test="${not empty requestScope.error}">
+    <div class="alerta alerta-error">
+        <c:out value="${requestScope.error}" />
+    </div>
+</c:if>
+
+<c:if test="${not empty requestScope.success}">
+    <div class="alerta alerta-exito">
+        <c:out value="${requestScope.success}" />
+    </div>
+</c:if>

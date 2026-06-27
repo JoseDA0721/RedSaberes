@@ -5,7 +5,6 @@ import com.epn.redsaberesweb.models.Usuario;
 import com.epn.redsaberesweb.repository.CursoRepository;
 import com.epn.redsaberesweb.repository.UsuarioRepository;
 import com.epn.redsaberesweb.service.CursoService;
-import com.epn.redsaberesweb.util.HibernateUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,10 +13,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.SessionFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @WebServlet(name = "CreateCourseServlet", urlPatterns = {"/courses/create"}) // Endpoint corregido
 public class CreateCourseServlet extends HttpServlet {
@@ -31,9 +30,8 @@ public class CreateCourseServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-            this.cursoService = new CursoService(new CursoRepository(sessionFactory));
-            this.usuarioRepository = new UsuarioRepository(sessionFactory);
+            this.cursoService = new CursoService(new CursoRepository());
+            this.usuarioRepository = new UsuarioRepository();
         } catch (Exception e) {
             logger.error("Error inicializando CreateCourseServlet", e);
             throw new ServletException("No se pudo inicializar el servicio de cursos o usuario", e);
@@ -66,9 +64,9 @@ public class CreateCourseServlet extends HttpServlet {
         }
 
         Long userId = (Long) session.getAttribute("userId");
-        Usuario creador = usuarioRepository.findById(userId); // Obtener el objeto Usuario completo
+        Optional<Usuario> creador = usuarioRepository.findById(userId); // Obtener el objeto Usuario completo
 
-        if (creador == null) {
+        if (creador.isEmpty()) {
             logger.error("Usuario no encontrado para el ID en sesión: {}", userId);
             request.setAttribute("error", "No se pudo encontrar el usuario creador.");
             request.getRequestDispatcher("/WEB-INF/vistas/create-course.jsp").forward(request, response);
@@ -84,7 +82,7 @@ public class CreateCourseServlet extends HttpServlet {
         nuevoCurso.setTitulo(titulo);
         nuevoCurso.setDescripcion(descripcion);
         nuevoCurso.setCategoria(categoria);
-        nuevoCurso.setCreador(creador); // Asignar el usuario creador
+        nuevoCurso.setCreador(creador.get()); // Asignar el usuario creador
         nuevoCurso.setFechaCreacion(LocalDateTime.now()); // Establecer la fecha de creación
         // El estado se establece por defecto en BORRADOR en la entidad Curso
 

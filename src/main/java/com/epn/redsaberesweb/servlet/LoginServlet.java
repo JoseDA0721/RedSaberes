@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.SessionFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,8 +26,7 @@ public class LoginServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            SessionFactory sessionFactory = com.epn.redsaberesweb.util.HibernateUtil.getSessionFactory();
-            UsuarioRepository usuarioRepository = new UsuarioRepository(sessionFactory);
+            UsuarioRepository usuarioRepository = new UsuarioRepository();
             this.authService = new com.epn.redsaberesweb.service.AuthService(usuarioRepository);
         } catch (Exception e) {
             logger.error("Error inicializando LoginServlet", e);
@@ -172,12 +170,5 @@ public class LoginServlet extends HttpServlet {
                 writer.write("{\"error\": \"Error al crear sesión\"}");
             }
         }
-    }
-
-    /**
-     * Inyecta el servicio de autenticación
-     */
-    public void setAuthService(AuthService authService) {
-        this.authService = authService;
     }
 }

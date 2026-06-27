@@ -3,7 +3,6 @@ package com.epn.redsaberesweb.servlet;
 import com.epn.redsaberesweb.models.Usuario;
 import com.epn.redsaberesweb.repository.UsuarioRepository;
 import com.epn.redsaberesweb.service.AuthService;
-import com.epn.redsaberesweb.util.HibernateUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,8 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.SessionFactory;
-
 import java.io.IOException;
 
 @WebServlet(name = "RegisterServlet", urlPatterns = {"/register"})
@@ -27,8 +24,7 @@ public class RegisterServlet extends HttpServlet {
         super.init();
 
         try {
-            SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-            UsuarioRepository usuarioRepository = new UsuarioRepository(sessionFactory);
+            UsuarioRepository usuarioRepository = new UsuarioRepository();
             this.authService = new AuthService(usuarioRepository);
         } catch (Exception e) {
             logger.error("Error inicializando RegisterServlet", e);

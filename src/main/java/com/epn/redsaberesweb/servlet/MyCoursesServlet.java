@@ -1,9 +1,7 @@
 package com.epn.redsaberesweb.servlet;
 
-import com.epn.redsaberesweb.models.Usuario; // Mantener el import por si se usa en otro lado, aunque no directamente para la sesión aquí
 import com.epn.redsaberesweb.repository.CursoRepository;
 import com.epn.redsaberesweb.service.CursoService;
-import com.epn.redsaberesweb.util.HibernateUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.SessionFactory;
 
 import java.io.IOException;
 
@@ -27,8 +24,7 @@ public class MyCoursesServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-            this.cursoService = new CursoService(new CursoRepository(sessionFactory));
+            this.cursoService = new CursoService(new CursoRepository());
         } catch (Exception e) {
             logger.error("Error inicializando MyCoursesServlet", e);
             throw new ServletException("No se pudo inicializar el servicio de cursos", e);
@@ -37,7 +33,7 @@ public class MyCoursesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
 
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -70,7 +66,4 @@ public class MyCoursesServlet extends HttpServlet {
         }
     }
 
-    public void setCursoService(CursoService cursoService) {
-        this.cursoService = cursoService;
-    }
 }

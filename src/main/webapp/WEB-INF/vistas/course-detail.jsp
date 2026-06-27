@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -122,18 +122,18 @@
     <c:if test="${not empty requestScope.curso}">
         <div class="detail-card">
             <header class="detail-header">
-                <h1><c:out value="${requestScope.curso.titulo}" /></h1>
-                <p><c:out value="${requestScope.curso.descripcion}" /></p>
+                <h1><c:out value="${requestScope.curso.titulo()}" /></h1>
+                <p><c:out value="${requestScope.curso.descripcion()}" /></p>
             </header>
 
             <div class="detail-info-grid">
                 <div class="info-item">
                     <span>Categoría</span>
-                    <strong><c:out value="${requestScope.curso.categoria}" /></strong>
+                    <strong><c:out value="${requestScope.curso.categoria()}" /></strong>
                 </div>
                 <div class="info-item">
                     <span>Estado</span>
-                    <strong><c:out value="${requestScope.curso.estado}" /></strong>
+                    <strong><c:out value="${requestScope.curso.estado()}" /></strong>
                 </div>
                 <div class="info-item">
                     <span>Fecha de Creación</span>
@@ -141,8 +141,8 @@
                 </div>
                 <div class="info-item">
                     <span>Creador</span>
-                    <strong><c:out value="${requestScope.curso.creadorNombres}"/> <c:out
-                            value="${requestScope.curso.creadorApellidos}"/></strong>
+                    <strong><c:out value="${requestScope.curso.creadorNombres()}"/> <c:out
+                            value="${requestScope.curso.creadorApellidos()}"/></strong>
                 </div>
             </div>
 
@@ -150,7 +150,7 @@
             <div class="detail-section">
                 <h2>Descripción Completa</h2>
                 <div class="detail-section-content">
-                    <p><c:out value="${requestScope.curso.descripcion}" /></p>
+                    <p><c:out value="${requestScope.curso.descripcion()}" /></p>
                 </div>
             </div>
 

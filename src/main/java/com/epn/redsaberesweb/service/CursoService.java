@@ -4,7 +4,9 @@ import com.epn.redsaberesweb.models.Curso;
 import com.epn.redsaberesweb.repository.CursoRepository;
 import com.epn.redsaberesweb.dto.CourseDetailDTO;
 
+
 import java.util.List;
+import java.util.Optional;
 
 public class CursoService {
     private final CursoRepository cursoRepository;
@@ -13,7 +15,7 @@ public class CursoService {
         this.cursoRepository = cursoRepository;
     }
 
-    public Curso crearCurso(Curso curso) {
+    public void crearCurso(Curso curso) {
         // Validaciones
         if (curso.getTitulo() == null || curso.getTitulo().trim().isEmpty()) {
             throw new IllegalArgumentException("El título del curso es obligatorio.");
@@ -34,11 +36,15 @@ public class CursoService {
         }
 
         cursoRepository.save(curso);
-        return curso;
     }
 
-    public CourseDetailDTO obtenerCurso(Long id) {
+    public Optional<Curso> obtenerCurso(Long id) {
         return cursoRepository.findById(id);
+    }
+
+    // En CursoService
+    public Optional<CourseDetailDTO> obtenerDetallesCurso(Long id) {
+        return cursoRepository.findDetailById(id); // ← delega directo al repo
     }
 
     public List<Curso> listarCursosPorCreador(Long creadorId) {

@@ -1,7 +1,7 @@
 package com.epn.redsaberesweb.service;
 
 import com.epn.redsaberesweb.domain.EstadoCurso;
-import com.epn.redsaberesweb.dto.CourseDetailDTO;
+import com.epn.redsaberesweb.dto.*;
 import com.epn.redsaberesweb.models.Curso;
 import com.epn.redsaberesweb.models.Usuario;
 import com.epn.redsaberesweb.repository.CursoRepository;
@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.Optional; // Importar Optional
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,17 +54,27 @@ class CursoSeviceTest {
     @Test
     @DisplayName("Debería crear un curso con datos válidos")
     void crearCurso_conDatosValidos_guardaYRetornaCurso() {
-        Curso curso = new Curso(creador, EstadoCurso.BORRADOR, LocalDateTime.now(),
+        Curso cursoInput = new Curso(creador, EstadoCurso.BORRADOR, LocalDateTime.now(),
                 "Programación", "Descripción del curso", "Título del Curso", null);
-        curso.setCreador(creador);
+        cursoInput.setCreador(creador);
 
-        when(cursoRepository.save(any(Curso.class))).thenReturn(1L);
+        // Corrección aquí: Usar doAnswer para métodos void
+        doAnswer(invocation -> {
+            Curso cursoArg = invocation.getArgument(0); // Captura el objeto Curso que se pasa a save
+            cursoArg.setId(1L); // Asigna un ID simulado, como lo haría Hibernate
+            return null; // Importante: para métodos void, el doAnswer debe retornar null
+        }).when(cursoRepository).save(any(Curso.class));
 
-        Curso resultado = cursoService.crearCurso(curso);
 
-        assertNotNull(resultado);
-        assertEquals("Título del Curso", resultado.getTitulo());
-        verify(cursoRepository, times(1)).save(curso);
+        cursoService.crearCurso(cursoInput);
+
+        // Las aserciones ahora verifican el estado del objeto cursoInput después de la llamada
+        assertNotNull(cursoInput.getId()); // Verificar que el ID fue asignado por el mock
+        assertEquals(1L, cursoInput.getId());
+        assertEquals("Título del Curso", cursoInput.getTitulo());
+        assertEquals("Programación", cursoInput.getCategoria());
+        assertEquals(creador, cursoInput.getCreador());
+        verify(cursoRepository, times(1)).save(cursoInput);
     }
 
     @ParameterizedTest
@@ -140,32 +151,32 @@ class CursoSeviceTest {
         verify(cursoRepository, never()).save(any(Curso.class));
     }
 
+
     @Test
-    @DisplayName("Debería retornar un DTO si existe el curso")
-    void obtenerCurso_existente_retornaDTO() {
+    @DisplayName("Debería retornar un Optional con Curso si existe el curso") // Nombre actualizado
+    void obtenerCurso_existente_retornaOptionalCurso() {
         Long cursoId = 1L;
 
-        CourseDetailDTO dtoEsperado = new CourseDetailDTO(
-                cursoId,
-                "Álgebra",
-                "Curso de matemáticas",
-                "Matemáticas",
-                EstadoCurso.PUBLICADO,
-                LocalDateTime.now(),
-                "Juan",
-                "Perez",
-                creador.getId()
-        );
+        // Crear un objeto Curso para ser retornado por el mock del repositorio
+        Curso cursoEsperado = new Curso(creador, EstadoCurso.PUBLICADO, LocalDateTime.now(),
+                "Matemáticas", "Curso de matemáticas", "Álgebra", cursoId);
+        cursoEsperado.setCreador(creador); // Asegurarse de que el creador esté configurado si es necesario para las aserciones
 
-        when(cursoRepository.findById(cursoId)).thenReturn(dtoEsperado);
 
-        CourseDetailDTO resultado = cursoService.obtenerCurso(cursoId);
+        when(cursoRepository.findById(cursoId)).thenReturn(Optional.of(cursoEsperado));
+
+        Optional<Curso> resultadoOpt = cursoService.obtenerCurso(cursoId);
+
+        assertTrue(resultadoOpt.isPresent());
+        Curso resultado = resultadoOpt.get();
 
         assertNotNull(resultado);
         assertEquals(cursoId, resultado.getId());
         assertEquals("Álgebra", resultado.getTitulo());
-        assertEquals("Juan", resultado.getCreadorNombres());
-        assertEquals(creador.getId(), resultado.getCreadorId());
+        assertEquals("Matemáticas", resultado.getCategoria());
+        assertNotNull(resultado.getCreador());
+        assertEquals(creador.getId(), resultado.getCreador().getId());
+        assertEquals(creador.getNombres(), resultado.getCreador().getNombres());
         verify(cursoRepository, times(1)).findById(cursoId);
     }
 
@@ -175,7 +186,7 @@ class CursoSeviceTest {
         Long cursoId = 99L;
         when(cursoRepository.findById(cursoId)).thenReturn(null);
 
-        CourseDetailDTO resultado = cursoService.obtenerCurso(cursoId);
+        Optional<Curso> resultado = cursoService.obtenerCurso(cursoId);
 
         assertNull(resultado);
         verify(cursoRepository, times(1)).findById(cursoId);

@@ -10,15 +10,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -191,11 +184,12 @@ class AuthServiceTest {
     @Test
     void register_conDatosValidos_guardaUsuarioConPasswordHash() {
         when(usuarioRepository.findByCorreo(CORREO_VALIDO)).thenReturn(null);
-        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> {
-            Usuario usuario = invocation.getArgument(0);
-            usuario.setId(1L);
-            return 1L;
-        });
+        doAnswer(invocation -> {
+            Usuario usuario = invocation.getArgument(0); // Captura el objeto Usuario que se pasa a save
+            usuario.setId(1L); // Asigna un ID simulado, como lo haría Hibernate
+            return null; // Importante: para métodos void, el doAnswer debe retornar null
+        }).when(usuarioRepository).save(any(Usuario.class));
+
 
         Usuario resultado = authService.register(
                 NOMBRE_VALIDO,
@@ -210,9 +204,9 @@ class AuthServiceTest {
         assertSame(APELLIDO_VALIDO, resultado.getApellidos());
         assertSame(CORREO_VALIDO, resultado.getCorreo());
         assertNotNull(resultado.getPasswordHash());
-        assertFalse(resultado.getPasswordHash().equals(PASSWORD_VALIDO));
+        assertNotEquals(PASSWORD_VALIDO, resultado.getPasswordHash());
         assertTrue(BCrypt.checkpw(PASSWORD_VALIDO, resultado.getPasswordHash()));
-        assertTrue(Boolean.TRUE.equals(resultado.getEstado()));
+        assertEquals(Boolean.TRUE, resultado.getEstado());
 
         verify(usuarioRepository).findByCorreo(CORREO_VALIDO);
         verify(usuarioRepository).save(any(Usuario.class));

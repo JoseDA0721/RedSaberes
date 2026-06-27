@@ -3,7 +3,6 @@ package com.epn.redsaberesweb.servlet;
 import com.epn.redsaberesweb.dto.CourseDetailDTO;
 import com.epn.redsaberesweb.repository.CursoRepository;
 import com.epn.redsaberesweb.service.CursoService;
-import com.epn.redsaberesweb.util.HibernateUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,10 +11,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.SessionFactory;
 
 import java.io.IOException;
-import java.time.format.DateTimeFormatter; // Importar DateTimeFormatter
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @WebServlet(name = "CourseDetailServlet", urlPatterns = {"/courses/detail"})
 public class CourseDetailServlet extends HttpServlet {
@@ -28,8 +27,7 @@ public class CourseDetailServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-            this.cursoService = new CursoService(new CursoRepository(sessionFactory));
+            this.cursoService = new CursoService(new CursoRepository());
         } catch (Exception e) {
             logger.error("Error inicializando CourseDetailServlet", e);
             throw new ServletException("No se pudo inicializar el servicio de cursos", e);
@@ -38,7 +36,7 @@ public class CourseDetailServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
@@ -57,29 +55,31 @@ public class CourseDetailServlet extends HttpServlet {
 
         try {
             Long courseId = Long.parseLong(courseIdParam);
-            CourseDetailDTO curso = cursoService.obtenerCurso(courseId);
+            Optional<CourseDetailDTO> curso= cursoService.obtenerDetallesCurso(courseId);
 
-            if (curso == null) {
+            if (curso.isEmpty()) {
                 logger.warn("Curso no encontrado para ID: {}. Usuario ID: {}", courseId, loggedInUserId);
                 request.setAttribute("error", "El curso solicitado no existe.");
                 request.getRequestDispatcher("/WEB-INF/vistas/course-detail.jsp").forward(request, response);
                 return;
             }
 
-            if (!curso.getCreadorId().equals(loggedInUserId)) {
+            CourseDetailDTO cursoDetail = curso.get();
+            System.out.println("Creador del curso: " + cursoDetail.creadorId() + ". Usuario ID: " + loggedInUserId + ".");
+            if (!cursoDetail.creadorId().equals(loggedInUserId)) {
                 logger.warn("Intento de acceso no autorizado al curso ID: {} por usuario ID: {}", courseId, loggedInUserId);
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "No tienes permiso para ver este curso.");
                 return;
             }
 
-            if (curso.getFechaCreacion() != null) {
+            if (cursoDetail.fechaCreacion() != null) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                request.setAttribute("fechaCreacionFormateada", curso.getFechaCreacion().format(formatter));
+                request.setAttribute("fechaCreacionFormateada", cursoDetail.fechaCreacion().format(formatter));
             } else {
                 request.setAttribute("fechaCreacionFormateada", "N/A");
             }
 
-            request.setAttribute("curso", curso);
+            request.setAttribute("curso", cursoDetail);
             request.getRequestDispatcher("/WEB-INF/vistas/course-detail.jsp")
                     .forward(request, response);
 
@@ -90,10 +90,5 @@ public class CourseDetailServlet extends HttpServlet {
             logger.error("Error al obtener detalles del curso ID: {} para usuario ID: {}", courseIdParam, loggedInUserId, e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno al cargar el curso.");
         }
-    }
-
-    // Método para inyectar el servicio en tests (opcional)
-    public void setCursoService(CursoService cursoService) {
-        this.cursoService = cursoService;
     }
 }

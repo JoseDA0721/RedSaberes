@@ -4,6 +4,7 @@ import com.epn.redsaberesweb.domain.EstadoCurso;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "cursos")
@@ -31,6 +32,10 @@ public class Curso {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creador_id", nullable = false)
     private Usuario creador;
+
+    @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Modulo> modulos;
+
 
     public Curso () {
 
@@ -107,6 +112,14 @@ public class Curso {
 
     public void setEstado(EstadoCurso estado) {
         this.estado = estado;
+    }
+
+    public List<Modulo> getModulos() {
+        return modulos;
+    }
+
+    public void setModulos(List<Modulo> modulos) {
+        this.modulos = modulos;
     }
 
     @Override
