@@ -596,7 +596,7 @@
                                     <span class="module-order"><c:out value="${modulo.orden}"/></span>
                                     <span class="module-title"><c:out value="${modulo.titulo}"/></span>
 
-                                        <%-- Muestra cantidad de lecciones si el modelo lo expone --%>
+<%--                                        &lt;%&ndash; Muestra cantidad de lecciones si el modelo lo expone &ndash;%&gt;--%>
                                     <c:if test="${not empty modulo.cantidadLecciones}">
                                         <span class="module-meta">${modulo.cantidadLecciones} lec.</span>
                                     </c:if>

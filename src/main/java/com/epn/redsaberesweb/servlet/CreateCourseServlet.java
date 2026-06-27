@@ -89,7 +89,7 @@ public class CreateCourseServlet extends HttpServlet {
         try {
             cursoService.crearCurso(nuevoCurso);
             logger.info("Curso '{}' creado exitosamente por el usuario ID: {}", titulo, userId);
-            response.sendRedirect(request.getContextPath() + "/dashboard"); // Redirigir al dashboard
+            response.sendRedirect(request.getContextPath() + "/modulos?cursoId=" + nuevoCurso.getId() + "&success=Curso+creado+exitosamente"); // Redirigir al dashboard
         } catch (IllegalArgumentException e) {
             // Error de validación del servicio
             logger.warn("Error de validación al crear curso para usuario ID {}: {}", userId, e.getMessage());

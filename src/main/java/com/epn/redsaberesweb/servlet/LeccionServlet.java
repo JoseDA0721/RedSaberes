@@ -66,6 +66,10 @@ public class LeccionServlet extends HttpServlet {
         try {
             Long moduloId = Long.parseLong(moduloIdParam);
             cargarDatosVistaLecciones(request, moduloId);
+            String cursoIdParam = request.getParameter("cursoId");
+            if (cursoIdParam != null && request.getAttribute("cursoId") == null) {
+                request.setAttribute("cursoId", Long.parseLong(cursoIdParam));
+            }
             request.getRequestDispatcher(LECCIONES_VIEW).forward(request, response);
 
         } catch (NumberFormatException e) {
@@ -137,6 +141,8 @@ public class LeccionServlet extends HttpServlet {
         try {
             String moduloIdParam = request.getParameter("moduloId");
             String titulo = request.getParameter("titulo");
+
+
             String ordenParam = request.getParameter("orden");
 
             if (moduloIdParam == null || moduloIdParam.trim().isEmpty()) {
@@ -158,6 +164,15 @@ public class LeccionServlet extends HttpServlet {
             Leccion nuevaLeccion = new Leccion();
             nuevaLeccion.setModulo(modulo);
             nuevaLeccion.setTitulo(titulo.trim());
+//            String tipo = request.getParameter("tipo");
+//            if (tipo != null && !tipo.trim().isEmpty()) {
+//                try {
+//                    nuevaLeccion.setTipo(Leccion.Tipo.valueOf(tipo.trim().toUpperCase()));
+//                } catch (IllegalArgumentException e) {
+//                    logger.warn("Tipo de lección inválido: {}", tipo);
+//                }
+//            }
+
             nuevaLeccion.setOrden(orden);
 
             leccionService.crearLeccion(nuevaLeccion);
@@ -217,6 +232,15 @@ public class LeccionServlet extends HttpServlet {
 
             Leccion leccion = leccionService.obtenerLeccion(leccionId);
             leccion.setTitulo(titulo.trim());
+
+//            String tipo = request.getParameter("tipo");
+//            if (tipo != null && !tipo.trim().isEmpty()) {
+//                try {
+//                    leccion.setTipo(Leccion.Tipo.valueOf(tipo.trim().toUpperCase()));
+//                } catch (IllegalArgumentException e) {
+//                    logger.warn("Tipo de lección inválido: {}", tipo);
+//                }
+//            }
             leccionService.editarLeccion(leccion);
 
             logger.info("Lección editada exitosamente. ID: {}. Usuario ID: {}", leccionId, userId);
@@ -317,6 +341,12 @@ public class LeccionServlet extends HttpServlet {
         request.setAttribute("modulo", modulo);
         request.setAttribute("moduloId", moduloId);
         request.setAttribute("lecciones", lecciones);
+
+        // ✅ Agregar datos del curso para el breadcrumb
+        if (modulo != null && modulo.getCurso() != null) {
+            request.setAttribute("cursoId", modulo.getCurso().getId());
+            request.setAttribute("cursoTitulo", modulo.getCurso().getTitulo());
+        }
     }
 
     private Long obtenerModuloIdDesdeRequest(HttpServletRequest request) {
