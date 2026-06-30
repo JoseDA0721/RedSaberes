@@ -183,6 +183,9 @@
 
             <a href="${pageContext.request.contextPath}/my-courses"
                class="nav-link ${activePage.contains('my-courses') ? 'activo' : ''}">Mis Cursos</a>
+            <!-- En la barra de navegación, añadir enlace público -->
+            <a href="${pageContext.request.contextPath}/catalogo"
+               class="nav-link" ${activePage.contains('catalogo') ? 'activo' : ''}>Catálogo</a>
         </nav>
 
         <!-- Acciones derecha -->

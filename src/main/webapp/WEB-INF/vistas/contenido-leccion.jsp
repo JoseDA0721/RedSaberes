@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="es">
@@ -28,15 +28,26 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
+
         .breadcrumb a {
             color: var(--color-texto-suave);
             text-decoration: none;
             font-weight: 600;
             transition: color .15s;
         }
-        .breadcrumb a:hover { color: var(--color-celeste); }
-        .breadcrumb .bc-sep { color: #d1d5db; }
-        .breadcrumb .bc-current { color: var(--color-texto); font-weight: 700; }
+
+        .breadcrumb a:hover {
+            color: var(--color-celeste);
+        }
+
+        .breadcrumb .bc-sep {
+            color: #d1d5db;
+        }
+
+        .breadcrumb .bc-current {
+            color: var(--color-texto);
+            font-weight: 700;
+        }
 
         /* ── Page header ── */
         .page-header {
@@ -47,6 +58,7 @@
             gap: 14px;
             margin-bottom: 24px;
         }
+
         .page-header h1 {
             font-size: clamp(20px, 3vw, 26px);
             font-weight: 800;
@@ -54,8 +66,15 @@
             color: var(--color-texto);
             margin-bottom: 4px;
         }
-        .page-header .subtitle { font-size: 13px; color: var(--color-texto-suave); }
-        .page-header .subtitle strong { color: var(--color-texto); }
+
+        .page-header .subtitle {
+            font-size: 13px;
+            color: var(--color-texto-suave);
+        }
+
+        .page-header .subtitle strong {
+            color: var(--color-texto);
+        }
 
         .btn-volver {
             display: inline-flex;
@@ -73,11 +92,15 @@
             transition: border-color .2s, transform .2s;
             white-space: nowrap;
         }
-        .btn-volver:hover { border-color: var(--color-celeste); transform: translateY(-1px); }
+
+        .btn-volver:hover {
+            border-color: var(--color-celeste);
+            transform: translateY(-1px);
+        }
 
         /* ── Info card: resumen de la lección ── */
         .info-card {
-            background: rgba(255,255,255,0.96);
+            background: rgba(255, 255, 255, 0.96);
             border: 1px solid #eef2f7;
             border-radius: var(--radio-grande);
             box-shadow: var(--sombra-suave);
@@ -88,6 +111,7 @@
             gap: 16px;
             flex-wrap: wrap;
         }
+
         .info-icon {
             width: 46px;
             height: 46px;
@@ -97,9 +121,14 @@
             place-items: center;
             color: #fff;
             flex-shrink: 0;
-            box-shadow: 0 6px 18px rgba(1,186,239,0.22);
+            box-shadow: 0 6px 18px rgba(1, 186, 239, 0.22);
         }
-        .info-body { flex: 1; min-width: 0; }
+
+        .info-body {
+            flex: 1;
+            min-width: 0;
+        }
+
         .info-body h2 {
             font-size: 16px;
             font-weight: 800;
@@ -109,7 +138,13 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .info-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .info-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
 
         .tipo-badge {
             display: inline-flex;
@@ -120,41 +155,62 @@
             font-size: 11px;
             font-weight: 700;
         }
-        .tipo-video   { background: #dbeafe; color: #1d4ed8; }
-        .tipo-texto   { background: #f3f4f6; color: #374151; }
-        .tipo-quiz    { background: #fef3c7; color: #92400e; }
+
+        .tipo-video {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .tipo-texto {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .tipo-quiz {
+            background: #fef3c7;
+            color: #92400e;
+        }
 
         .modulo-tag {
             font-size: 11px;
             font-weight: 700;
             color: var(--color-azul-oscuro);
-            background: rgba(1,186,239,0.10);
-            border: 1px solid rgba(1,186,239,0.20);
+            background: rgba(1, 186, 239, 0.10);
+            border: 1px solid rgba(1, 186, 239, 0.20);
             padding: 3px 10px;
             border-radius: 999px;
         }
+
         .badge-con-contenido {
-            font-size: 11px; font-weight: 700;
-            background: #ecfdf3; color: #166534;
+            font-size: 11px;
+            font-weight: 700;
+            background: #ecfdf3;
+            color: #166534;
             border: 1px solid #bbf7d0;
-            padding: 3px 10px; border-radius: 999px;
+            padding: 3px 10px;
+            border-radius: 999px;
         }
+
         .badge-sin-contenido {
-            font-size: 11px; font-weight: 700;
-            background: #fff7ed; color: #9a3412;
+            font-size: 11px;
+            font-weight: 700;
+            background: #fff7ed;
+            color: #9a3412;
             border: 1px solid #fed7aa;
-            padding: 3px 10px; border-radius: 999px;
+            padding: 3px 10px;
+            border-radius: 999px;
         }
 
         /* ── Content cards ── */
         .content-card {
-            background: rgba(255,255,255,0.96);
+            background: rgba(255, 255, 255, 0.96);
             border: 1px solid #eef2f7;
             border-radius: var(--radio-grande);
             box-shadow: var(--sombra-suave);
             overflow: hidden;
             margin-bottom: 16px;
         }
+
         .content-card-header {
             display: flex;
             align-items: center;
@@ -164,6 +220,7 @@
             background: #fafbfc;
             gap: 10px;
         }
+
         .content-card-header h2 {
             font-size: 14px;
             font-weight: 700;
@@ -173,22 +230,34 @@
             gap: 8px;
             margin: 0;
         }
+
         .badge-guardado {
-            font-size: 11px; font-weight: 700;
-            background: #d1fae5; color: #065f46;
-            border-radius: 999px; padding: 2px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 999px;
+            padding: 2px 9px;
         }
+
         .badge-sin-texto {
-            font-size: 11px; font-weight: 700;
-            background: #f1f5f9; color: var(--color-texto-suave);
-            border: 1px solid #e2e8f0;
-            border-radius: 999px; padding: 2px 9px;
-        }
-        .count-badge {
-            font-size: 11px; font-weight: 700;
+            font-size: 11px;
+            font-weight: 700;
+            background: #f1f5f9;
             color: var(--color-texto-suave);
-            background: #f1f5f9; border: 1px solid #e2e8f0;
-            border-radius: 999px; padding: 2px 9px;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            padding: 2px 9px;
+        }
+
+        .count-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-texto-suave);
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            padding: 2px 9px;
         }
 
         /* ── Botón editar texto (header) ── */
@@ -198,23 +267,27 @@
             gap: 6px;
             height: 32px;
             padding: 0 13px;
-            border: 1.5px solid rgba(1,186,239,0.35);
+            border: 1.5px solid rgba(1, 186, 239, 0.35);
             border-radius: 8px;
-            background: rgba(1,186,239,0.07);
+            background: rgba(1, 186, 239, 0.07);
             color: var(--color-azul-oscuro);
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: background .15s, border-color .15s;
         }
+
         .btn-editar-texto:hover,
         .btn-editar-texto.active {
-            background: rgba(1,186,239,0.15);
+            background: rgba(1, 186, 239, 0.15);
             border-color: var(--color-celeste);
         }
 
         /* ── Texto: display de texto guardado ── */
-        .texto-display-body { padding: 20px 22px; }
+        .texto-display-body {
+            padding: 20px 22px;
+        }
+
         .texto-content {
             font-size: 14px;
             line-height: 1.8;
@@ -227,6 +300,7 @@
             padding: 16px;
             min-height: 80px;
         }
+
         .texto-meta {
             font-size: 11px;
             color: var(--color-texto-suave);
@@ -238,10 +312,12 @@
         .texto-form-body {
             padding: 20px 22px;
         }
+
         .texto-form-body.edit-mode {
             background: #f0fbfd;
-            border-top: 1px solid rgba(1,186,239,0.15);
+            border-top: 1px solid rgba(1, 186, 239, 0.15);
         }
+
         .form-label {
             display: block;
             font-size: 12px;
@@ -251,12 +327,17 @@
             letter-spacing: 0.04em;
             margin-bottom: 8px;
         }
-        .form-label.accent { color: var(--color-celeste); }
+
+        .form-label.accent {
+            color: var(--color-celeste);
+        }
+
         .form-hint {
             font-size: 13px;
             color: var(--color-texto-suave);
             margin-bottom: 14px;
         }
+
         .textarea-control {
             width: 100%;
             min-height: 180px;
@@ -273,10 +354,12 @@
             transition: border-color .2s, box-shadow .2s;
             font-family: inherit;
         }
+
         .textarea-control:focus {
             border-color: var(--color-celeste);
-            box-shadow: 0 0 0 3px rgba(1,186,239,0.14);
+            box-shadow: 0 0 0 3px rgba(1, 186, 239, 0.14);
         }
+
         .char-counter {
             font-size: 11px;
             color: var(--color-texto-suave);
@@ -284,10 +367,19 @@
             margin-top: 6px;
             min-height: 16px;
         }
-        .char-counter.warning { color: #ef4444; font-weight: 700; }
+
+        .char-counter.warning {
+            color: #ef4444;
+            font-weight: 700;
+        }
 
         /* ── Imágenes existentes ── */
-        .imagen-list { list-style: none; padding: 0; margin: 0; }
+        .imagen-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
         .imagen-item {
             display: flex;
             align-items: center;
@@ -296,8 +388,14 @@
             border-bottom: 1px solid #f1f5f9;
             transition: background .2s;
         }
-        .imagen-item:last-child { border-bottom: none; }
-        .imagen-item:hover { background: #f8fafc; }
+
+        .imagen-item:last-child {
+            border-bottom: none;
+        }
+
+        .imagen-item:hover {
+            background: #f8fafc;
+        }
 
         .img-thumb {
             width: 52px;
@@ -307,6 +405,7 @@
             border: 1px solid #e2e8f0;
             flex-shrink: 0;
         }
+
         .img-thumb-placeholder {
             width: 52px;
             height: 52px;
@@ -318,6 +417,7 @@
             flex-shrink: 0;
             color: #94a3b8;
         }
+
         .img-orden {
             font-size: 12px;
             font-weight: 800;
@@ -326,7 +426,12 @@
             text-align: center;
             flex-shrink: 0;
         }
-        .img-info { flex: 1; min-width: 0; }
+
+        .img-info {
+            flex: 1;
+            min-width: 0;
+        }
+
         .img-nombre {
             font-size: 13px;
             font-weight: 700;
@@ -335,49 +440,81 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .img-meta { font-size: 11px; color: var(--color-texto-suave); margin-top: 2px; }
+
+        .img-meta {
+            font-size: 11px;
+            color: var(--color-texto-suave);
+            margin-top: 2px;
+        }
+
         .ext-badge {
             font-size: 10px;
             font-weight: 800;
             padding: 2px 8px;
             border-radius: 5px;
-            background: rgba(1,186,239,0.10);
+            background: rgba(1, 186, 239, 0.10);
             color: var(--color-azul-oscuro);
             flex-shrink: 0;
         }
+
         .btn-del-img {
-            width: 32px; height: 32px;
-            border: none; border-radius: 8px;
-            cursor: pointer; display: grid; place-items: center;
-            background: transparent; color: #94a3b8;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            background: transparent;
+            color: #94a3b8;
             transition: background .15s, color .15s;
             flex-shrink: 0;
         }
-        .btn-del-img:hover { background: #fef2f2; color: #ef4444; }
+
+        .btn-del-img:hover {
+            background: #fef2f2;
+            color: #ef4444;
+        }
 
         /* Empty state imágenes */
         .imgs-empty {
             padding: 44px 24px;
             text-align: center;
         }
+
         .imgs-empty-icon {
-            width: 50px; height: 50px;
-            border-radius: 16px; background: rgba(1,186,239,0.08);
-            display: inline-grid; place-items: center;
-            color: var(--color-celeste); margin-bottom: 12px;
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            background: rgba(1, 186, 239, 0.08);
+            display: inline-grid;
+            place-items: center;
+            color: var(--color-celeste);
+            margin-bottom: 12px;
         }
-        .imgs-empty h3 { font-size: 14px; font-weight: 700; color: var(--color-texto); margin-bottom: 5px; }
-        .imgs-empty p  { font-size: 12px; color: var(--color-texto-suave); }
+
+        .imgs-empty h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-texto);
+            margin-bottom: 5px;
+        }
+
+        .imgs-empty p {
+            font-size: 12px;
+            color: var(--color-texto-suave);
+        }
 
         /* ── Zona de subida ── */
         .upload-card {
-            background: rgba(255,255,255,0.96);
+            background: rgba(255, 255, 255, 0.96);
             border: 1px solid #eef2f7;
             border-radius: var(--radio-grande);
             box-shadow: var(--sombra-suave);
             padding: 22px 24px;
             margin-bottom: 16px;
         }
+
         .upload-card h2 {
             font-size: 14px;
             font-weight: 700;
@@ -387,12 +524,16 @@
             gap: 8px;
             margin-bottom: 6px;
         }
+
         .upload-slots {
             font-size: 12px;
             color: var(--color-texto-suave);
             margin-bottom: 16px;
         }
-        .upload-slots strong { color: var(--color-texto); }
+
+        .upload-slots strong {
+            color: var(--color-texto);
+        }
 
         .drop-zone {
             position: relative;
@@ -408,11 +549,13 @@
             transition: border-color .2s, background .2s;
             text-align: center;
         }
+
         .drop-zone:hover,
         .drop-zone.drag-over {
             border-color: var(--color-celeste);
-            background: rgba(1,186,239,0.04);
+            background: rgba(1, 186, 239, 0.04);
         }
+
         .drop-zone input[type="file"] {
             position: absolute;
             inset: 0;
@@ -421,17 +564,32 @@
             opacity: 0;
             cursor: pointer;
         }
+
         .drop-icon {
-            width: 46px; height: 46px;
-            background: rgba(1,186,239,0.10);
+            width: 46px;
+            height: 46px;
+            background: rgba(1, 186, 239, 0.10);
             border-radius: 14px;
             display: inline-grid;
             place-items: center;
             color: var(--color-celeste);
         }
-        .drop-title { font-size: 14px; font-weight: 700; color: var(--color-texto); }
-        .drop-sub   { font-size: 12px; color: var(--color-texto-suave); }
-        .drop-sub span { color: var(--color-celeste); font-weight: 700; }
+
+        .drop-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-texto);
+        }
+
+        .drop-sub {
+            font-size: 12px;
+            color: var(--color-texto-suave);
+        }
+
+        .drop-sub span {
+            color: var(--color-celeste);
+            font-weight: 700;
+        }
 
         /* Preview de archivo seleccionado */
         .file-preview {
@@ -444,29 +602,54 @@
             border: 1px solid #e2e8f0;
             border-radius: var(--radio-pequeno);
         }
-        .file-preview.visible { display: flex; }
+
+        .file-preview.visible {
+            display: flex;
+        }
+
         .preview-img {
-            width: 48px; height: 48px;
+            width: 48px;
+            height: 48px;
             border-radius: 8px;
             object-fit: cover;
             border: 1px solid #e2e8f0;
             flex-shrink: 0;
         }
-        .preview-info { flex: 1; min-width: 0; }
-        .preview-name {
-            font-size: 13px; font-weight: 700;
-            color: var(--color-texto);
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+
+        .preview-info {
+            flex: 1;
+            min-width: 0;
         }
-        .preview-size { font-size: 11px; color: var(--color-texto-suave); margin-top: 2px; }
+
+        .preview-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-texto);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .preview-size {
+            font-size: 11px;
+            color: var(--color-texto-suave);
+            margin-top: 2px;
+        }
+
         .btn-clear-file {
-            background: none; border: none;
-            cursor: pointer; color: #94a3b8;
-            padding: 4px; border-radius: 6px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #94a3b8;
+            padding: 4px;
+            border-radius: 6px;
             transition: color .15s;
             flex-shrink: 0;
         }
-        .btn-clear-file:hover { color: #ef4444; }
+
+        .btn-clear-file:hover {
+            color: #ef4444;
+        }
 
         /* ── Botones de formulario ── */
         .form-actions {
@@ -475,6 +658,7 @@
             margin-top: 16px;
             align-items: center;
         }
+
         .btn-primary {
             display: inline-flex;
             align-items: center;
@@ -488,11 +672,21 @@
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 6px 18px rgba(1,186,239,0.24);
+            box-shadow: 0 6px 18px rgba(1, 186, 239, 0.24);
             transition: transform .2s, box-shadow .2s, opacity .2s;
         }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(1,186,239,0.32); opacity: 0.95; }
-        .btn-primary:disabled { opacity: 0.42; cursor: not-allowed; transform: none; }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(1, 186, 239, 0.32);
+            opacity: 0.95;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.42;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         .btn-secondary {
             display: inline-flex;
@@ -509,7 +703,10 @@
             cursor: pointer;
             transition: border-color .2s;
         }
-        .btn-secondary:hover { border-color: var(--color-celeste); }
+
+        .btn-secondary:hover {
+            border-color: var(--color-celeste);
+        }
 
         .upload-submit {
             display: flex;
@@ -536,17 +733,21 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.38);
+            background: rgba(0, 0, 0, 0.38);
             backdrop-filter: blur(4px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
         }
-        .modal-overlay.active { display: flex; }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
         .modal-box {
             background: #fff;
             border-radius: var(--radio-grande);
-            box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
             padding: 28px;
             max-width: 400px;
             width: calc(100% - 32px);
@@ -554,44 +755,90 @@
             flex-direction: column;
             gap: 20px;
         }
+
         .modal-body {
             display: flex;
             align-items: flex-start;
             gap: 12px;
         }
-        .modal-warn-icon { color: #f59e0b; flex-shrink: 0; margin-top: 2px; }
+
+        .modal-warn-icon {
+            color: #f59e0b;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
         .modal-title {
             font-size: 15px;
             font-weight: 800;
             color: var(--color-texto);
             margin-bottom: 4px;
         }
-        .modal-desc { font-size: 13px; color: var(--color-texto-suave); line-height: 1.55; }
-        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+        .modal-desc {
+            font-size: 13px;
+            color: var(--color-texto-suave);
+            line-height: 1.55;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
         .btn-modal-cancel {
-            height: 36px; padding: 0 16px;
+            height: 36px;
+            padding: 0 16px;
             border: 1.5px solid var(--color-borde);
             border-radius: var(--radio-pequeno);
-            background: #fff; color: var(--color-texto);
-            font-size: 13px; font-weight: 700; cursor: pointer;
+            background: #fff;
+            color: var(--color-texto);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
             transition: border-color .2s;
         }
-        .btn-modal-cancel:hover { border-color: var(--color-celeste); }
+
+        .btn-modal-cancel:hover {
+            border-color: var(--color-celeste);
+        }
+
         .btn-modal-confirm {
-            height: 36px; padding: 0 18px;
-            border: 0; border-radius: var(--radio-pequeno);
-            background: #ef4444; color: #fff;
-            font-size: 13px; font-weight: 700; cursor: pointer;
+            height: 36px;
+            padding: 0 18px;
+            border: 0;
+            border-radius: var(--radio-pequeno);
+            background: #ef4444;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
             transition: background .2s;
         }
-        .btn-modal-confirm:hover { background: #dc2626; }
+
+        .btn-modal-confirm:hover {
+            background: #dc2626;
+        }
 
         /* ── Responsive ── */
         @media (max-width: 640px) {
-            .contenido-main { padding: 24px 14px 56px; }
-            .imagen-item { flex-wrap: wrap; }
-            .form-actions { flex-direction: column; }
-            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+            .contenido-main {
+                padding: 24px 14px 56px;
+            }
+
+            .imagen-item {
+                flex-wrap: wrap;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -608,7 +855,8 @@
             <svg class="modal-warn-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
             <div>
                 <p id="delImgModalTitle" class="modal-title">¿Eliminar imagen?</p>
@@ -619,10 +867,10 @@
             <button type="button" class="btn-modal-cancel" onclick="closeDelImgModal()">Cancelar</button>
             <form id="delImgForm" method="post" action="${pageContext.request.contextPath}/contenido-leccion"
                   style="display:contents;">
-                <input type="hidden" name="operacion"  value="eliminarImagen">
-                <input type="hidden" name="leccionId"  value="${leccion.id}">
-                <input type="hidden" name="cursoId"    value="${cursoId}">
-                <input type="hidden" name="imagenId"   id="delImgIdInput">
+                <input type="hidden" name="operacion" value="eliminarImagen">
+                <input type="hidden" name="leccionId" value="${leccion.id}">
+                <input type="hidden" name="cursoId" value="${cursoId}">
+                <input type="hidden" name="imagenId" id="delImgIdInput">
                 <button type="submit" class="btn-modal-confirm">Sí, eliminar</button>
             </form>
         </div>
@@ -763,7 +1011,7 @@
 
         <input type="hidden" name="operacion" value="guardar">
         <input type="hidden" name="leccionId" value="${leccion.id}">
-        <input type="hidden" name="cursoId"   value="${cursoId}">
+        <input type="hidden" name="cursoId" value="${cursoId}">
 
         <%-- ─────────────────────────────────────
              SECCIÓN 1 — CONTENIDO DE TEXTO
@@ -848,7 +1096,8 @@
             <c:if test="${empty contenido or not contenido.tieneTexto}">
                 <div class="texto-form-body">
                     <p class="form-hint">
-                        Esta lección aún no tiene texto. Escríbelo aquí para que los estudiantes puedan leerlo.
+                        Esta lección aún no tiene texto. Escríbelo aquí para que los
+                        estudiantes puedan leerlo.
                     </p>
                     <label class="form-label" for="textoInput">Texto de la lección</label>
                     <textarea id="textoInput"
@@ -857,7 +1106,22 @@
                               maxlength="${maxCaracteres}"
                               placeholder="Escribe el contenido de la lección aquí..."
                               rows="8"></textarea>
-                    <p class="char-counter" id="charCounter">0 / <c:out value="${maxCaracteres}"/> caracteres</p>
+                    <p class="char-counter" id="charCounter">
+                        0 / <c:out value="${maxCaracteres}"/> caracteres
+                    </p>
+
+                        <%-- ✅ AÑADIR ESTE BLOQUE — faltaba completamente --%>
+                    <div class="form-actions" style="margin-top: 16px; padding-top: 16px;
+             border-top: 1px solid #f1f5f9;">
+                        <button type="submit" class="btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2.5" aria-hidden="true">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Guardar Texto
+                        </button>
+                    </div>
                 </div>
             </c:if>
         </div>
@@ -919,7 +1183,8 @@
                                          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="3 6 5 6 21 6"/>
                                         <path d="M19 6l-1 14H6L5 6"/>
-                                        <path d="M10 11v6"/><path d="M14 11v6"/>
+                                        <path d="M10 11v6"/>
+                                        <path d="M14 11v6"/>
                                         <path d="M9 6V4h6v2"/>
                                     </svg>
                                 </button>
@@ -955,7 +1220,8 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2">
                         <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
                     </svg>
                     Límite alcanzado: esta lección ya tiene el máximo de
                     <strong>${maxImagenes} imágenes</strong>.
@@ -1040,7 +1306,8 @@
             </c:otherwise>
         </c:choose>
 
-    </form><%-- /mainForm --%>
+    </form>
+    <%-- /mainForm --%>
 
 </main>
 
@@ -1050,13 +1317,13 @@
     /* ═══════════════════════════════════════════════════════
        CONTADOR DE CARACTERES
     ════════════════════════════════════════════════════════ */
-    const MAX_CHARS   = parseInt('${maxCaracteres}', 10) || 5000;
-    const textoInput  = document.getElementById('textoInput');
+    const MAX_CHARS = parseInt('${maxCaracteres}', 10) || 5000;
+    const textoInput = document.getElementById('textoInput');
     const charCounter = document.getElementById('charCounter');
 
     function actualizarContador() {
         if (!textoInput || !charCounter) return;
-        const len  = textoInput.value.length;
+        const len = textoInput.value.length;
         const rest = MAX_CHARS - len;
         charCounter.textContent = len.toLocaleString() + ' / ' + MAX_CHARS.toLocaleString() + ' caracteres';
         if (rest < 0) {
@@ -1077,15 +1344,15 @@
        TOGGLE EDITAR TEXTO
     ════════════════════════════════════════════════════════ */
     function toggleEditarTexto() {
-        const display   = document.getElementById('textoDisplay');
-        const editForm  = document.getElementById('textoEditForm');
-        const btn       = document.getElementById('btnEditarTexto');
+        const display = document.getElementById('textoDisplay');
+        const editForm = document.getElementById('textoEditForm');
+        const btn = document.getElementById('btnEditarTexto');
         if (!editForm) return;
 
         const estaOculto = editForm.style.display === 'none';
         editForm.style.display = estaOculto ? 'block' : 'none';
         if (display) display.style.display = estaOculto ? 'none' : 'block';
-        if (btn)     btn.classList.toggle('active', estaOculto);
+        if (btn) btn.classList.toggle('active', estaOculto);
         if (estaOculto && textoInput) {
             textoInput.focus();
             actualizarContador();
@@ -1093,29 +1360,29 @@
     }
 
     function cancelarEditarTexto() {
-        const display  = document.getElementById('textoDisplay');
+        const display = document.getElementById('textoDisplay');
         const editForm = document.getElementById('textoEditForm');
-        const btn      = document.getElementById('btnEditarTexto');
-        if (editForm)  editForm.style.display = 'none';
-        if (display)   display.style.display  = 'block';
-        if (btn)       btn.classList.remove('active');
+        const btn = document.getElementById('btnEditarTexto');
+        if (editForm) editForm.style.display = 'none';
+        if (display) display.style.display = 'block';
+        if (btn) btn.classList.remove('active');
     }
 
     /* ═══════════════════════════════════════════════════════
        UPLOAD — preview + validación cliente
     ════════════════════════════════════════════════════════ */
-    const MAX_SIZE   = 5 * 1024 * 1024; // 5 MB
-    const fileInput  = document.getElementById('fileInput');
-    const dropZone   = document.getElementById('dropZone');
-    const filePreview   = document.getElementById('filePreview');
-    const previewImg    = document.getElementById('previewImg');
-    const previewName   = document.getElementById('previewName');
-    const previewSize   = document.getElementById('previewSize');
+    const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const filePreview = document.getElementById('filePreview');
+    const previewImg = document.getElementById('previewImg');
+    const previewName = document.getElementById('previewName');
+    const previewSize = document.getElementById('previewSize');
     const btnSubirImagen = document.getElementById('btnSubirImagen');
 
     function formatBytes(bytes) {
-        if (bytes < 1024)       return bytes + ' B';
-        if (bytes < 1_048_576)  return (bytes / 1024).toFixed(1) + ' KB';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1_048_576) return (bytes / 1024).toFixed(1) + ' KB';
         return (bytes / 1_048_576).toFixed(1) + ' MB';
     }
 
@@ -1136,8 +1403,8 @@
         }
         // Mostrar preview
         const reader = new FileReader();
-        reader.onload = function(e) {
-            previewImg.src      = e.target.result;
+        reader.onload = function (e) {
+            previewImg.src = e.target.result;
             previewName.textContent = file.name;
             previewSize.textContent = formatBytes(file.size);
             filePreview.classList.add('visible');
@@ -1147,14 +1414,14 @@
     }
 
     function limpiarArchivo() {
-        if (fileInput)  fileInput.value = '';
-        if (previewImg) previewImg.src  = '';
+        if (fileInput) fileInput.value = '';
+        if (previewImg) previewImg.src = '';
         if (filePreview) filePreview.classList.remove('visible');
         if (btnSubirImagen) btnSubirImagen.disabled = true;
     }
 
     if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
+        fileInput.addEventListener('change', function (e) {
             if (e.target.files && e.target.files[0]) {
                 mostrarArchivo(e.target.files[0]);
             }
@@ -1163,18 +1430,18 @@
 
     // Drag & drop
     if (dropZone) {
-        ['dragenter', 'dragover'].forEach(function(evt) {
-            dropZone.addEventListener(evt, function(e) {
+        ['dragenter', 'dragover'].forEach(function (evt) {
+            dropZone.addEventListener(evt, function (e) {
                 e.preventDefault();
                 dropZone.classList.add('drag-over');
             });
         });
-        ['dragleave', 'drop'].forEach(function(evt) {
-            dropZone.addEventListener(evt, function(e) {
+        ['dragleave', 'drop'].forEach(function (evt) {
+            dropZone.addEventListener(evt, function (e) {
                 dropZone.classList.remove('drag-over');
             });
         });
-        dropZone.addEventListener('drop', function(e) {
+        dropZone.addEventListener('drop', function (e) {
             e.preventDefault();
             const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
             if (file) {
@@ -1182,7 +1449,8 @@
                     const dt = new DataTransfer();
                     dt.items.add(file);
                     fileInput.files = dt.files;
-                } catch(_) { /* fallback sin asignar a input */ }
+                } catch (_) { /* fallback sin asignar a input */
+                }
                 mostrarArchivo(file);
             }
         });
@@ -1197,13 +1465,15 @@
             '¿Eliminar "' + nombreArchivo + '"? Esta acción no se puede deshacer.';
         document.getElementById('delImgModal').classList.add('active');
     }
+
     function closeDelImgModal() {
         document.getElementById('delImgModal').classList.remove('active');
     }
-    document.getElementById('delImgModal').addEventListener('click', function(e) {
+
+    document.getElementById('delImgModal').addEventListener('click', function (e) {
         if (e.target === this) closeDelImgModal();
     });
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeDelImgModal();
     });
 </script>
