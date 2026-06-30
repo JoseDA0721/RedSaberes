@@ -66,15 +66,15 @@ class CursoSeviceTest {
         }).when(cursoRepository).save(any(Curso.class));
 
 
-        cursoService.crearCurso(cursoInput);
+        Curso resultado = cursoService.crearCurso(cursoInput);
 
         // Las aserciones ahora verifican el estado del objeto cursoInput después de la llamada
-        assertNotNull(cursoInput.getId()); // Verificar que el ID fue asignado por el mock
-        assertEquals(1L, cursoInput.getId());
-        assertEquals("Título del Curso", cursoInput.getTitulo());
-        assertEquals("Programación", cursoInput.getCategoria());
-        assertEquals(creador, cursoInput.getCreador());
-        verify(cursoRepository, times(1)).save(cursoInput);
+        assertNotNull(resultado.getId()); // Verificar que el ID fue asignado por el mock
+        assertEquals(1L, resultado.getId());
+        assertEquals("Título del Curso", resultado.getTitulo());
+        assertEquals("Programación", resultado.getCategoria());
+        assertEquals(creador, resultado.getCreador());
+        verify(cursoRepository, times(1)).save(resultado);
     }
 
     @ParameterizedTest

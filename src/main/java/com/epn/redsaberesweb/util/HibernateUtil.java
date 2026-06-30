@@ -1,9 +1,6 @@
 package com.epn.redsaberesweb.util;
 
-import com.epn.redsaberesweb.models.Curso;
-import com.epn.redsaberesweb.models.Leccion;
-import com.epn.redsaberesweb.models.Modulo;
-import com.epn.redsaberesweb.models.Usuario;
+import com.epn.redsaberesweb.models.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -49,6 +46,8 @@ public class HibernateUtil {
             configuration.addAnnotatedClass(Curso.class);
             configuration.addAnnotatedClass(Modulo.class);
             configuration.addAnnotatedClass(Leccion.class);
+            configuration.addAnnotatedClass(ContenidoLeccion.class);
+            configuration.addAnnotatedClass(ImagenLeccion.class);
 
             return configuration.buildSessionFactory();
         } catch (Exception e) {

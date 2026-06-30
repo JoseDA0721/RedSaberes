@@ -122,6 +122,14 @@ public class Curso {
         this.modulos = modulos;
     }
 
+    public String getFechaCreacionFormateada() {
+        if (fechaCreacion == null) return "—";
+        return fechaCreacion.format(
+                java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm",
+                        new java.util.Locale("es", "ES"))
+        );
+    }
+
     @Override
     public String toString() {
         return "Curso{" +

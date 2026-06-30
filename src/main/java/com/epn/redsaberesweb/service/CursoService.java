@@ -15,7 +15,7 @@ public class CursoService {
         this.cursoRepository = cursoRepository;
     }
 
-    public void crearCurso(Curso curso) {
+    public Curso crearCurso(Curso curso) {
         // Validaciones
         if (curso.getTitulo() == null || curso.getTitulo().trim().isEmpty()) {
             throw new IllegalArgumentException("El título del curso es obligatorio.");
@@ -36,6 +36,8 @@ public class CursoService {
         }
 
         cursoRepository.save(curso);
+
+        return curso;
     }
 
     public Optional<Curso> obtenerCurso(Long id) {

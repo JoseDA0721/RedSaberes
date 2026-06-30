@@ -87,9 +87,11 @@ public class CreateCourseServlet extends HttpServlet {
         // El estado se establece por defecto en BORRADOR en la entidad Curso
 
         try {
-            cursoService.crearCurso(nuevoCurso);
-            logger.info("Curso '{}' creado exitosamente por el usuario ID: {}", titulo, userId);
-            response.sendRedirect(request.getContextPath() + "/modulos?cursoId=" + nuevoCurso.getId() + "&success=Curso+creado+exitosamente"); // Redirigir al dashboard
+            Curso creado = cursoService.crearCurso(nuevoCurso);
+            logger.info("Curso '{}' creado con ID: {} por usuario ID: {}", titulo, creado.getId(), userId);
+            response.sendRedirect(request.getContextPath()
+                    + "/modulos?cursoId=" + creado.getId()
+                    + "&success=Curso+creado+exitosamente.+Ahora+añade+los+módulos.");// Redirigir al dashboard
         } catch (IllegalArgumentException e) {
             // Error de validación del servicio
             logger.warn("Error de validación al crear curso para usuario ID {}: {}", userId, e.getMessage());

@@ -8,15 +8,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -49,6 +56,61 @@ class LeccionServiceTest {
         leccion1 = crearLeccion(1L, 1);
         leccion2 = crearLeccion(2L, 2);
         leccion3 = crearLeccion(3L, 3);
+    }
+
+    @Test
+    void crear_conTituloValido_asignaSiguienteOrdenYTieneContenidoFalse() {
+        when(moduloRepository.findById(1L)).thenReturn(Optional.of(modulo));
+        when(leccionRepository.listarPorModulo(1L)).thenReturn(List.of(leccion1, leccion2, leccion3));
+        ArgumentCaptor<Leccion> captor = ArgumentCaptor.forClass(Leccion.class);
+
+        leccionService.crear(1, "Nueva lección");
+
+        verify(leccionRepository).save(captor.capture());
+        Leccion leccionGuardada = captor.getValue();
+        assertEquals(4, leccionGuardada.getOrden());
+        assertFalse(leccionGuardada.isTieneContenido());
+        assertEquals(modulo, leccionGuardada.getModulo());
+    }
+
+    @ParameterizedTest
+    @MethodSource("titulosInvalidos")
+    void crear_conTitulosInvalidos_lanzaExcepcion(String titulo) {
+        assertThrows(IllegalArgumentException.class, () -> leccionService.crear(1, titulo));
+
+        verify(leccionRepository, never()).save(any(Leccion.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("titulosLimiteValidos")
+    void crear_conTitulosLimiteValidos_creaLeccion(String titulo) {
+        when(moduloRepository.findById(1L)).thenReturn(Optional.of(modulo));
+        when(leccionRepository.listarPorModulo(1L)).thenReturn(List.of());
+
+        assertDoesNotThrow(() -> leccionService.crear(1, titulo));
+
+        verify(leccionRepository).save(any(Leccion.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("titulosInvalidos")
+    void editar_conTitulosInvalidos_lanzaExcepcion(String titulo) {
+        assertThrows(IllegalArgumentException.class, () -> leccionService.editar(1, titulo));
+
+        verify(leccionRepository, never()).save(any(Leccion.class));
+        verify(leccionRepository, never()).update(any(Leccion.class));
+    }
+
+    @Test
+    void eliminarLeccion_recalculaOrdenesRestantes() {
+        when(leccionRepository.findById(2L)).thenReturn(Optional.of(leccion2));
+        when(leccionRepository.listarPorModulo(1L)).thenReturn(List.of(leccion1, leccion2, leccion3));
+
+        leccionService.eliminarLeccion(2L);
+
+        verify(leccionRepository).delete(2L);
+        verify(leccionRepository).actualizarOrden(3L, 2);
+        verify(leccionRepository, never()).actualizarOrden(1L, 1);
     }
 
     @Test
@@ -134,5 +196,13 @@ class LeccionServiceTest {
         leccion.setOrden(orden);
         leccion.setTieneContenido(false);
         return leccion;
+    }
+
+    private static Stream<String> titulosInvalidos() {
+        return Stream.of(null, "", "   ", "ab", "a".repeat(101));
+    }
+
+    private static Stream<String> titulosLimiteValidos() {
+        return Stream.of("abc", "a".repeat(100));
     }
 }

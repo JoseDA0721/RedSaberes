@@ -143,59 +143,50 @@ public class ModuloServlet extends HttpServlet {
     private void handleCrearModulo(HttpServletRequest request, HttpServletResponse response, Long cursoId)
             throws IOException {
         String titulo = request.getParameter("titulo");
-        String ordenParam = request.getParameter("orden");
-        Optional<Curso> curso = cursoRepository.findById(cursoId);
-        Modulo nuevoModulo = new Modulo();
-        nuevoModulo.setTitulo(titulo);
-        nuevoModulo.setCurso(curso.get());
 
-        if (ordenParam != null && !ordenParam.trim().isEmpty()) {
-            try {
-                nuevoModulo.setOrden(Integer.parseInt(ordenParam));
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("El formato del orden es inválido.");
-            }
-        } else {
-            // Lógica para asignar un orden por defecto si no se especifica
-            // Por ejemplo, encontrar el último orden y sumarle 1.
-            // Para simplificar, si no viene, el servicio podría manejarlo o lanzar error.
-            // Aquí asumimos que el servicio lo validará o asignará.
-        }
+        if (titulo == null || titulo.trim().isEmpty())
+            throw new IllegalArgumentException("El título del módulo es obligatorio.");
+
+        Optional<Curso> cursoOpt = cursoRepository.findById(cursoId);
+        if (cursoOpt.isEmpty())
+            throw new IllegalArgumentException("El curso no existe.");
+
+        // Calcular el orden: contar los módulos existentes + 1
+        List<Modulo> modulosExistentes = moduloService.listarModulosPorCurso(cursoId);
+        int siguienteOrden = modulosExistentes.size() + 1;
+
+        Modulo nuevoModulo = new Modulo();
+        nuevoModulo.setTitulo(titulo.trim());
+        nuevoModulo.setCurso(cursoOpt.get());
+        nuevoModulo.setOrden(siguienteOrden);
 
         moduloService.crearModulo(nuevoModulo);
-        response.sendRedirect(request.getContextPath() + "/modulos?cursoId=" + cursoId + "&success=Modulo creado exitosamente.");
+        response.sendRedirect(request.getContextPath()
+                + "/modulos?cursoId=" + cursoId
+                + "&success=Módulo+creado+exitosamente.");
     }
 
     private void handleEditarModulo(HttpServletRequest request, HttpServletResponse response, Long cursoId)
-            throws IOException{
+            throws IOException {
         String moduloIdParam = request.getParameter("moduloId");
         String titulo = request.getParameter("titulo");
-        String ordenParam = request.getParameter("orden");
 
-        if (moduloIdParam == null || moduloIdParam.trim().isEmpty()) {
+        if (moduloIdParam == null || moduloIdParam.trim().isEmpty())
             throw new IllegalArgumentException("ID de módulo requerido para editar.");
-        }
+        if (titulo == null || titulo.trim().isEmpty())
+            throw new IllegalArgumentException("El título es obligatorio.");
+
         Long moduloId = Long.parseLong(moduloIdParam);
-        Optional<Curso> curso = cursoRepository.findById(cursoId);
-        Modulo moduloAEditar = new Modulo();
-        moduloAEditar.setId(moduloId);
-        moduloAEditar.setTitulo(titulo);
-        moduloAEditar.setCurso(curso.get()); // Asegurar que el curso está asociado
 
-        if (ordenParam != null && !ordenParam.trim().isEmpty()) {
-            try {
-                moduloAEditar.setOrden(Integer.parseInt(ordenParam));
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("El formato del orden es inválido.");
-            }
-        } else {
-            // Si el orden no se especifica, se podría mantener el orden existente
-            // o lanzar una excepción si es obligatorio.
-            // Por ahora, el servicio lo validará.
-        }
+        // IMPORTANTE: fetchear el módulo existente para no sobreescribir campos (orden, curso)
+        Modulo moduloExistente = moduloService.obtenerModulo(moduloId);
+        moduloExistente.setTitulo(titulo.trim());
+        // El orden y el curso se mantienen del objeto ya existente
 
-        moduloService.editarModulo(moduloAEditar);
-        response.sendRedirect(request.getContextPath() + "/modulos?cursoId=" + cursoId + "&success=Modulo actualizado exitosamente.");
+        moduloService.editarModulo(moduloExistente);
+        response.sendRedirect(request.getContextPath()
+                + "/modulos?cursoId=" + cursoId
+                + "&success=Módulo+actualizado+exitosamente.");
     }
 
     private void handleEliminarModulo(HttpServletRequest request, HttpServletResponse response, Long cursoId)

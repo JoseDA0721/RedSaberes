@@ -40,7 +40,9 @@ class ModuloServiceTest {
     private ModuloService moduloService;
 
     private Curso cursoExistente;
-    private Modulo moduloExistente;
+    private Modulo moduloExistente; // Orden 1
+    private Modulo moduloAdyacente; // Orden 2
+    private Modulo otroModulo; // Orden 3
 
     @BeforeEach
     void setUp() {
@@ -52,7 +54,19 @@ class ModuloServiceTest {
         moduloExistente.setId(10L);
         moduloExistente.setCurso(cursoExistente);
         moduloExistente.setTitulo("Introducción");
-        moduloExistente.setOrden(1);
+        moduloExistente.setOrden(1); // Orden inicial
+
+        moduloAdyacente = new Modulo();
+        moduloAdyacente.setId(11L);
+        moduloAdyacente.setCurso(cursoExistente);
+        moduloAdyacente.setTitulo("Segundo Tema");
+        moduloAdyacente.setOrden(2); // Orden inicial
+
+        otroModulo = new Modulo();
+        otroModulo.setId(12L);
+        otroModulo.setCurso(cursoExistente);
+        otroModulo.setTitulo("Tercer Tema");
+        otroModulo.setOrden(3); // Orden inicial
     }
 
     // --- Tests para crearModulo ---
@@ -396,21 +410,74 @@ class ModuloServiceTest {
     // --- Tests para reordenarModulo ---
 
     @Test
-    @DisplayName("Debería reordenar un módulo dentro del mismo curso")
-    void dado_modulo_y_nuevo_orden_validos_cuando_reordenar_modulo_entonces_orden_actualizado() {
+    @DisplayName("Debería reordenar un módulo intercambiando su orden con un adyacente (subir)")
+    void dado_modulo_y_nuevo_orden_valido_subir_cuando_reordenar_modulo_entonces_orden_intercambiado() {
+        // GIVEN
+        // Queremos mover moduloAdyacente (orden 2) a la posición de moduloExistente (orden 1)
+        Long moduloIdToReorder = moduloAdyacente.getId(); // Modulo con orden 2
+        int nuevoOrden = 1; // Queremos moverlo a la posición del moduloExistente
+
+        // Mockear las llamadas al repositorio
+        when(moduloRepository.findById(moduloIdToReorder)).thenReturn(Optional.of(moduloAdyacente));
+        when(moduloRepository.listarPorCurso(cursoExistente.getId())).thenReturn(Arrays.asList(moduloExistente, moduloAdyacente, otroModulo));
+        doNothing().when(moduloRepository).intercambiarOrdenes(moduloAdyacente.getId(), moduloExistente.getId());
+
+        // WHEN
+        moduloService.reordenarModulo(moduloIdToReorder, nuevoOrden);
+
+        // THEN
+        // 1. Verificar llamadas al repositorio
+        verify(moduloRepository, times(1)).findById(moduloIdToReorder);
+        verify(moduloRepository, times(1)).listarPorCurso(cursoExistente.getId());
+        verify(moduloRepository, times(1)).intercambiarOrdenes(moduloAdyacente.getId(), moduloExistente.getId());
+
+        // 2. Asegurarse de que no hubo otras interacciones inesperadas
+        verifyNoMoreInteractions(moduloRepository, cursoRepository);
+    }
+
+    @Test
+    @DisplayName("Debería reordenar un módulo intercambiando su orden con un adyacente (bajar)")
+    void dado_modulo_y_nuevo_orden_valido_bajar_cuando_reordenar_modulo_entonces_orden_intercambiado() {
+        // GIVEN
+        // Queremos mover moduloExistente (orden 1) a la posición de moduloAdyacente (orden 2)
+        Long moduloIdToReorder = moduloExistente.getId(); // Modulo con orden 1
+        int nuevoOrden = 2; // Queremos moverlo a la posición del moduloAdyacente
+
+        // Mockear las llamadas al repositorio
+        when(moduloRepository.findById(moduloIdToReorder)).thenReturn(Optional.of(moduloExistente));
+        when(moduloRepository.listarPorCurso(cursoExistente.getId())).thenReturn(Arrays.asList(moduloExistente, moduloAdyacente, otroModulo));
+        doNothing().when(moduloRepository).intercambiarOrdenes(moduloExistente.getId(), moduloAdyacente.getId());
+
+        // WHEN
+        moduloService.reordenarModulo(moduloIdToReorder, nuevoOrden);
+
+        // THEN
+        // 1. Verificar llamadas al repositorio
+        verify(moduloRepository, times(1)).findById(moduloIdToReorder);
+        verify(moduloRepository, times(1)).listarPorCurso(cursoExistente.getId());
+        verify(moduloRepository, times(1)).intercambiarOrdenes(moduloExistente.getId(), moduloAdyacente.getId());
+
+        // 2. Asegurarse de que no hubo otras interacciones inesperadas
+        verifyNoMoreInteractions(moduloRepository, cursoRepository);
+    }
+
+    @Test
+    @DisplayName("No debería hacer nada si el nuevo orden es igual al actual")
+    void dado_modulo_y_mismo_orden_cuando_reordenar_modulo_entonces_no_hay_interacciones() {
         // GIVEN
         Long moduloId = moduloExistente.getId();
-        int nuevoOrden = 5;
+        int nuevoOrden = moduloExistente.getOrden(); // Mismo orden
 
         when(moduloRepository.findById(moduloId)).thenReturn(Optional.of(moduloExistente));
-        doNothing().when(moduloRepository).actualizarOrden(moduloId, nuevoOrden); // actualizarOrden es void
+        when(moduloRepository.listarPorCurso(cursoExistente.getId())).thenReturn(Arrays.asList(moduloExistente, moduloAdyacente, otroModulo));
 
         // WHEN
         moduloService.reordenarModulo(moduloId, nuevoOrden);
 
         // THEN
         verify(moduloRepository, times(1)).findById(moduloId);
-        verify(moduloRepository, times(1)).actualizarOrden(moduloId, nuevoOrden);
+        verify(moduloRepository, times(1)).listarPorCurso(cursoExistente.getId());
+        verify(moduloRepository, never()).intercambiarOrdenes(anyLong(), anyLong()); // No se llama a intercambiarOrdenes
         verifyNoMoreInteractions(moduloRepository, cursoRepository);
     }
 
@@ -423,26 +490,27 @@ class ModuloServiceTest {
         assertEquals("El ID del módulo es obligatorio para reordenar.", exception.getMessage());
 
         verify(moduloRepository, never()).findById(anyLong());
-        verify(moduloRepository, never()).actualizarOrden(anyLong(), anyInt());
+        verify(moduloRepository, never()).listarPorCurso(anyLong());
+        verify(moduloRepository, never()).intercambiarOrdenes(anyLong(), anyLong());
         verifyNoMoreInteractions(moduloRepository, cursoRepository);
     }
 
     @Test
-    @DisplayName("Debería lanzar IllegalArgumentException si el nuevo orden es inválido al reordenar")
+    @DisplayName("Debería lanzar IllegalArgumentException si el nuevo orden es inválido (cero o negativo)")
     void dado_nuevo_orden_invalido_cuando_reordenar_modulo_entonces_lanza_excepcion() {
         // GIVEN
         Long moduloId = moduloExistente.getId();
         int nuevoOrdenInvalido = 0; // Orden debe ser >= 1
-
-        when(moduloRepository.findById(moduloId)).thenReturn(Optional.of(moduloExistente));
 
         // WHEN & THEN
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> moduloService.reordenarModulo(moduloId, nuevoOrdenInvalido));
         assertEquals("El nuevo orden debe ser un número positivo.", exception.getMessage());
 
-        verify(moduloRepository, times(1)).findById(moduloId);
-        verify(moduloRepository, never()).actualizarOrden(anyLong(), anyInt());
+        // VERIFICACIÓN
+        verify(moduloRepository, never()).findById(anyLong());
+        verify(moduloRepository, never()).listarPorCurso(anyLong());
+        verify(moduloRepository, never()).intercambiarOrdenes(anyLong(), anyLong());
         verifyNoMoreInteractions(moduloRepository, cursoRepository);
     }
 
@@ -458,10 +526,74 @@ class ModuloServiceTest {
         // WHEN & THEN
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> moduloService.reordenarModulo(moduloIdNoExistente, nuevoOrden));
-        assertEquals("El módulo a reordenar no existe.", exception.getMessage());
+        assertEquals("El módulo con ID "+ moduloIdNoExistente+" no existe.", exception.getMessage());
 
         verify(moduloRepository, times(1)).findById(moduloIdNoExistente);
-        verify(moduloRepository, never()).actualizarOrden(anyLong(), anyInt());
+        verify(moduloRepository, never()).listarPorCurso(anyLong());
+        verify(moduloRepository, never()).intercambiarOrdenes(anyLong(), anyLong());
+        verifyNoMoreInteractions(moduloRepository, cursoRepository);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar IllegalArgumentException si la posición de destino está fuera de rango")
+    void dado_posicion_destino_fuera_de_rango_cuando_reordenar_modulo_entonces_lanza_excepcion() {
+        // GIVEN
+        Long moduloId = moduloExistente.getId(); // Orden 1
+        int nuevoOrdenFueraDeRango = 5; // Fuera del rango de 3 módulos
+
+        when(moduloRepository.findById(moduloId)).thenReturn(Optional.of(moduloExistente));
+        when(moduloRepository.listarPorCurso(cursoExistente.getId())).thenReturn(Arrays.asList(moduloExistente, moduloAdyacente, otroModulo));
+
+        // WHEN & THEN
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> moduloService.reordenarModulo(moduloId, nuevoOrdenFueraDeRango));
+        assertEquals("Posición de destino fuera de rango.", exception.getMessage());
+
+        verify(moduloRepository, times(1)).findById(moduloId);
+        verify(moduloRepository, times(1)).listarPorCurso(cursoExistente.getId());
+        verify(moduloRepository, never()).intercambiarOrdenes(anyLong(), anyLong());
+        verifyNoMoreInteractions(moduloRepository, cursoRepository);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar IllegalStateException si el módulo no pertenece al curso (no encontrado en la lista)")
+    void dado_modulo_no_pertenece_al_curso_cuando_reordenar_modulo_entonces_lanza_excepcion() {
+        // GIVEN
+        Long moduloId = moduloExistente.getId();
+        int nuevoOrden = 2;
+
+        // Mockear que findById lo encuentra, pero listarPorCurso no lo incluye
+        when(moduloRepository.findById(moduloId)).thenReturn(Optional.of(moduloExistente));
+        when(moduloRepository.listarPorCurso(cursoExistente.getId())).thenReturn(Arrays.asList(moduloAdyacente, otroModulo)); // Lista sin moduloExistente
+
+        // WHEN & THEN
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> moduloService.reordenarModulo(moduloId, nuevoOrden));
+        assertEquals("El módulo no pertenece al curso.", exception.getMessage());
+
+        verify(moduloRepository, times(1)).findById(moduloId);
+        verify(moduloRepository, times(1)).listarPorCurso(cursoExistente.getId());
+        verify(moduloRepository, never()).intercambiarOrdenes(anyLong(), anyLong());
+        verifyNoMoreInteractions(moduloRepository, cursoRepository);
+    }
+
+    @Test
+    @DisplayName("No debería hacer nada si el módulo ya está en su lugar (indiceActual == indiceDestino)")
+    void dado_modulo_ya_en_su_lugar_cuando_reordenar_modulo_entonces_no_hay_interacciones() {
+        // GIVEN
+        Long moduloId = moduloExistente.getId();
+        int nuevoOrden = moduloExistente.getOrden(); // Mismo orden que el actual
+
+        when(moduloRepository.findById(moduloId)).thenReturn(Optional.of(moduloExistente));
+        when(moduloRepository.listarPorCurso(cursoExistente.getId())).thenReturn(Arrays.asList(moduloExistente, moduloAdyacente, otroModulo));
+
+        // WHEN
+        moduloService.reordenarModulo(moduloId, nuevoOrden);
+
+        // THEN
+        verify(moduloRepository, times(1)).findById(moduloId);
+        verify(moduloRepository, times(1)).listarPorCurso(cursoExistente.getId());
+        verify(moduloRepository, never()).intercambiarOrdenes(anyLong(), anyLong());
         verifyNoMoreInteractions(moduloRepository, cursoRepository);
     }
 }

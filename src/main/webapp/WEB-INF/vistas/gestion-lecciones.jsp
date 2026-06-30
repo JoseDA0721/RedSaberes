@@ -200,6 +200,16 @@
         .btn-icon-del   { color: #94a3b8; }
         .btn-icon-del:hover { background: #fef2f2; color: #ef4444; }
 
+        /* ── Botón gestionar contenido ── */
+        .btn-icon-content {
+            color: #64748b;
+            text-decoration: none;
+        }
+        .btn-icon-content:hover {
+            background: rgba(1,186,239,0.12);
+            color: var(--color-celeste);
+        }
+
         /* ── Formulario de edición inline ── */
         .edit-leccion-row {
             display: none;
@@ -520,31 +530,40 @@
                                         <c:out value="${leccion.tieneContenido ? 'Con contenido' : 'Sin contenido'}"/>
                                     </span>
 
-                                    <div class="leccion-actions">
-                                        <button type="button"
-                                                class="btn-icon btn-icon-edit"
-                                                id="editLecBtn${leccion.id}"
-                                                onclick="toggleEditLec('${leccion.id}')"
-                                                title="Editar lección">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                                            </svg>
-                                        </button>
-                                        <button type="button"
-                                                class="btn-icon btn-icon-del"
-                                                onclick="openDelModal('${pageContext.request.contextPath}/lecciones','${leccion.id}','${modulo.id}','<c:out value="${leccion.titulo}"/>')"
-                                                title="Eliminar lección">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <polyline points="3 6 5 6 21 6"/>
-                                                <path d="M19 6l-1 14H6L5 6"/>
-                                                <path d="M10 11v6"/><path d="M14 11v6"/>
-                                                <path d="M9 6V4h6v2"/>
-                                            </svg>
-                                        </button>
-                                    </div>
+                                            <div class="leccion-actions">
+
+                                                    <%-- NUEVO: botón Contenido (navega a contenido-leccion.jsp) --%>
+                                                <a href="${pageContext.request.contextPath}/contenido-leccion?leccionId=${leccion.id}&cursoId=${requestScope.cursoId}"
+                                                   class="btn-icon btn-icon-content"
+                                                   title="Gestionar contenido">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                         aria-hidden="true">
+                                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                                        <polyline points="14 2 14 8 20 8"/>
+                                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                                        <line x1="10" y1="9"  x2="8" y2="9"/>
+                                                    </svg>
+                                                </a>
+
+                                                    <%-- Editar lección (existente) --%>
+                                                <button type="button"
+                                                        class="btn-icon btn-icon-edit"
+                                                        id="editLecBtn${leccion.id}"
+                                                        onclick="toggleEditLec('${leccion.id}')"
+                                                        title="Editar lección">
+                                                        <%-- SVG igual que antes --%>
+                                                </button>
+
+                                                    <%-- Eliminar lección (existente) --%>
+                                                <button type="button"
+                                                        class="btn-icon btn-icon-del"
+                                                        onclick="openDelModal('${pageContext.request.contextPath}/lecciones','${leccion.id}','${modulo.id}','<c:out value="${leccion.titulo}"/>')"
+                                                        title="Eliminar lección">
+                                                        <%-- SVG igual que antes --%>
+                                                </button>
+                                            </div>
                                 </div>
 
                                     <%-- Formulario de edición inline --%>

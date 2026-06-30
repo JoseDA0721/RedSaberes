@@ -26,7 +26,7 @@ public class ModuloRepository extends GenericRepositoryImpl<Modulo, Long> {
     public List<Modulo> listarPorCurso(Long cursoId) {
         try (Session session = getSessionFactory().openSession()) {
             return session.createQuery(
-                            "SELECT m FROM Modulo m WHERE m.curso.id = :cursoId ORDER BY m.orden ASC",
+                            "SELECT m FROM Modulo m LEFT JOIN FETCH m.lecciones WHERE m.curso.id = :cursoId ORDER BY m.orden ASC",
                             Modulo.class
                     )
                     .setParameter("cursoId", cursoId)
@@ -34,30 +34,6 @@ public class ModuloRepository extends GenericRepositoryImpl<Modulo, Long> {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al listar módulos por curso", e);
             throw new RuntimeException("No se pudieron listar los módulos para el curso con ID: " + cursoId, e);
-        }
-    }
-
-    /**
-     * Actualiza directamente el campo 'orden' de un módulo específico.
-     * @param moduloId El ID del módulo a actualizar.
-     * @param nuevoOrden El nuevo valor para el campo 'orden'.
-     */
-    public void actualizarOrden(Long moduloId, int nuevoOrden) {
-        Transaction tx = null;
-        try (Session session = getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-            Query<?> query = session.createQuery(
-                    "UPDATE Modulo m SET m.orden = :nuevoOrden WHERE m.id = :moduloId"
-            );
-            query.setParameter("nuevoOrden", nuevoOrden);
-            query.setParameter("moduloId", moduloId);
-            query.executeUpdate();
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null && tx.isActive()) {
-                tx.rollback();
-            }
-            throw new RuntimeException("No se pudo actualizar el orden del módulo con ID: " + moduloId, e);
         }
     }
 
@@ -80,6 +56,32 @@ public class ModuloRepository extends GenericRepositoryImpl<Modulo, Long> {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error al obtener módulo por orden", e);
             throw new RuntimeException("No se pudo obtener el módulo para el curso " + cursoId + " y orden " + orden, e);
+        }
+    }
+
+    public void intercambiarOrdenes(Long moduloIdA, Long moduloIdB) {
+        Transaction tx = null;
+        try (Session session = getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+
+            Modulo moduloA = session.find(Modulo.class, moduloIdA);
+            Modulo moduloB = session.find(Modulo.class, moduloIdB);
+
+            if (moduloA == null || moduloB == null) {
+                throw new IllegalArgumentException("No se encontraron los módulos para intercambiar órdenes.");
+            }
+
+            int ordenTemp = moduloA.getOrden();
+            moduloA.setOrden(moduloB.getOrden());
+            moduloB.setOrden(ordenTemp);
+
+            session.merge(moduloA);
+            session.merge(moduloB);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) tx.rollback();
+            logger.log(Level.SEVERE, "Error al intercambiar órdenes de módulos", e);
+            throw new RuntimeException("No se pudieron intercambiar los órdenes de los módulos.", e);
         }
     }
 }

@@ -327,7 +327,7 @@
 
                                 <div class="course-detail-item">
                                     <span class="label">Creado</span>
-                                    <strong class="course-date"><c:out value="${curso.fechaCreacion}"/></strong>
+                                    <strong class="course-date"><c:out value="${curso.fechaCreacionFormateada}"/></strong>
                                 </div>
                             </div>
                         </div>

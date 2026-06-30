@@ -1,5 +1,6 @@
 package com.epn.redsaberesweb.models;
 
+import com.epn.redsaberesweb.domain.TipoLeccion;
 import jakarta.persistence.*;
 
 @Entity
@@ -23,7 +24,19 @@ public class Leccion {
     @Column(nullable = false, columnDefinition = "boolean default false", name = "tiene_contenido")
     private boolean tieneContenido = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = true)
+    private TipoLeccion tipo = TipoLeccion.TEXTO;
+
     // Getters and Setters
+    public TipoLeccion getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoLeccion tipo) {
+        this.tipo = tipo;
+    }
+
     public Long getId() {
         return id;
     }

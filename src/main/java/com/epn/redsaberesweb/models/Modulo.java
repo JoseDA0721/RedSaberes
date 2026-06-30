@@ -64,4 +64,8 @@ public class Modulo {
     public void setLecciones(List<Leccion> lecciones) {
         this.lecciones = lecciones;
     }
+
+    public int getCantidadLecciones() {
+        return lecciones != null ? lecciones.size() : 0;
+    }
 }

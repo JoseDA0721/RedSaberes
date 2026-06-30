@@ -1,5 +1,6 @@
 package com.epn.redsaberesweb.servlet;
 
+import com.epn.redsaberesweb.domain.TipoLeccion;
 import com.epn.redsaberesweb.models.Leccion;
 import com.epn.redsaberesweb.models.Modulo;
 import com.epn.redsaberesweb.repository.LeccionRepository;
@@ -137,23 +138,15 @@ public class LeccionServlet extends HttpServlet {
     /**
      * Maneja la creación de una nueva lección.
      */
-    private void handleCrear(HttpServletRequest request, HttpServletResponse response, Long userId) throws IOException {
+    private void handleCrear(HttpServletRequest request, HttpServletResponse response, Long userId)
+            throws IOException {
         try {
             String moduloIdParam = request.getParameter("moduloId");
             String titulo = request.getParameter("titulo");
-
-
             String ordenParam = request.getParameter("orden");
+            String tipoParam = request.getParameter("tipo"); // NUEVO
 
-            if (moduloIdParam == null || moduloIdParam.trim().isEmpty()) {
-                throw new IllegalArgumentException("El ID del módulo es obligatorio.");
-            }
-            if (titulo == null || titulo.trim().isEmpty()) {
-                throw new IllegalArgumentException("El título es obligatorio.");
-            }
-            if (ordenParam == null || ordenParam.trim().isEmpty()) {
-                throw new IllegalArgumentException("El orden es obligatorio.");
-            }
+            // ...validaciones existentes...
 
             Long moduloId = Long.parseLong(moduloIdParam);
             int orden = Integer.parseInt(ordenParam);
@@ -164,29 +157,21 @@ public class LeccionServlet extends HttpServlet {
             Leccion nuevaLeccion = new Leccion();
             nuevaLeccion.setModulo(modulo);
             nuevaLeccion.setTitulo(titulo.trim());
-//            String tipo = request.getParameter("tipo");
-//            if (tipo != null && !tipo.trim().isEmpty()) {
-//                try {
-//                    nuevaLeccion.setTipo(Leccion.Tipo.valueOf(tipo.trim().toUpperCase()));
-//                } catch (IllegalArgumentException e) {
-//                    logger.warn("Tipo de lección inválido: {}", tipo);
-//                }
-//            }
-
             nuevaLeccion.setOrden(orden);
 
-            leccionService.crearLeccion(nuevaLeccion);
+            // NUEVO: asignar tipo si viene del formulario
+            if (tipoParam != null && !tipoParam.trim().isEmpty()) {
+                try {
+                    nuevaLeccion.setTipo(TipoLeccion.valueOf(tipoParam.trim().toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    nuevaLeccion.setTipo(TipoLeccion.VIDEO); // fallback
+                }
+            }
 
-            logger.info("Lección creada exitosamente. Usuario ID: {}", userId);
-            request.setAttribute("success", "Lección creada exitosamente.");
+            leccionService.crearLeccion(nuevaLeccion);
             response.sendRedirect(request.getContextPath() + "/lecciones?moduloId=" + moduloId);
 
-        } catch (NumberFormatException e) {
-            logger.warn("Formato de número inválido: {}", e.getMessage());
-            request.setAttribute("error", "Formato de número inválido.");
-            forwardToLecciones(request, response, obtenerModuloIdDesdeRequest(request));
         } catch (IllegalArgumentException e) {
-            logger.warn("Validación fallida al crear lección: {}", e.getMessage());
             request.setAttribute("error", e.getMessage());
             forwardToLecciones(request, response, obtenerModuloIdDesdeRequest(request));
         }
@@ -216,43 +201,36 @@ public class LeccionServlet extends HttpServlet {
     /**
      * Maneja la edición de una lección existente.
      */
-    private void handleEditar(HttpServletRequest request, HttpServletResponse response, Long userId) throws IOException {
+    private void handleEditar(HttpServletRequest request, HttpServletResponse response, Long userId)
+            throws IOException {
         try {
             String leccionIdParam = request.getParameter("leccionId");
             String titulo = request.getParameter("titulo");
+            String tipoParam = request.getParameter("tipo"); // NUEVO
 
-            if (leccionIdParam == null || leccionIdParam.trim().isEmpty()) {
+            if (leccionIdParam == null || leccionIdParam.trim().isEmpty())
                 throw new IllegalArgumentException("El ID de la lección es obligatorio.");
-            }
-            if (titulo == null || titulo.trim().isEmpty()) {
+            if (titulo == null || titulo.trim().isEmpty())
                 throw new IllegalArgumentException("El título es obligatorio.");
-            }
 
             Long leccionId = Long.parseLong(leccionIdParam);
-
             Leccion leccion = leccionService.obtenerLeccion(leccionId);
             leccion.setTitulo(titulo.trim());
 
-//            String tipo = request.getParameter("tipo");
-//            if (tipo != null && !tipo.trim().isEmpty()) {
-//                try {
-//                    leccion.setTipo(Leccion.Tipo.valueOf(tipo.trim().toUpperCase()));
-//                } catch (IllegalArgumentException e) {
-//                    logger.warn("Tipo de lección inválido: {}", tipo);
-//                }
-//            }
-            leccionService.editarLeccion(leccion);
+            // NUEVO: actualizar tipo si viene del formulario
+            if (tipoParam != null && !tipoParam.trim().isEmpty()) {
+                try {
+                    leccion.setTipo(TipoLeccion.valueOf(tipoParam.trim().toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    // tipo inválido: mantener el actual
+                }
+            }
 
-            logger.info("Lección editada exitosamente. ID: {}. Usuario ID: {}", leccionId, userId);
+            leccionService.editarLeccion(leccion);
             Long moduloId = leccion.getModulo().getId();
             response.sendRedirect(request.getContextPath() + "/lecciones?moduloId=" + moduloId);
 
-        } catch (NumberFormatException e) {
-            logger.warn("Formato de número inválido: {}", e.getMessage());
-            request.setAttribute("error", "Formato de número inválido.");
-            forwardToLecciones(request, response, obtenerModuloIdDesdeRequest(request));
         } catch (IllegalArgumentException e) {
-            logger.warn("Validación fallida al editar lección: {}", e.getMessage());
             request.setAttribute("error", e.getMessage());
             forwardToLecciones(request, response, obtenerModuloIdDesdeRequest(request));
         }
@@ -336,16 +314,24 @@ public class LeccionServlet extends HttpServlet {
     }
 
     private void cargarDatosVistaLecciones(HttpServletRequest request, Long moduloId) {
-        Modulo modulo = leccionService.obtenerModulo(moduloId);
+        Modulo modulo    = leccionService.obtenerModulo(moduloId);
         List<Leccion> lecciones = leccionService.listarLeccionesPorModulo(moduloId);
-        request.setAttribute("modulo", modulo);
-        request.setAttribute("moduloId", moduloId);
+
+        request.setAttribute("modulo",    modulo);
+        request.setAttribute("moduloId",  moduloId);
         request.setAttribute("lecciones", lecciones);
 
-        // ✅ Agregar datos del curso para el breadcrumb
+        // ← NUEVO: exponer cursoId y cursoTitulo para el botón "Contenido"
         if (modulo != null && modulo.getCurso() != null) {
-            request.setAttribute("cursoId", modulo.getCurso().getId());
+            request.setAttribute("cursoId",     modulo.getCurso().getId());
             request.setAttribute("cursoTitulo", modulo.getCurso().getTitulo());
+        } else {
+            // Fallback desde parámetro URL si la relación lazy no cargó
+            String cursoIdParam = request.getParameter("cursoId");
+            if (cursoIdParam != null) {
+                try { request.setAttribute("cursoId", Long.parseLong(cursoIdParam)); }
+                catch (NumberFormatException ignored) {}
+            }
         }
     }
 

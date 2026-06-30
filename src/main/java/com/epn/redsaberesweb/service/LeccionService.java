@@ -24,12 +24,16 @@ public class LeccionService {
     public void crear(int moduloId, String titulo) {
         String tituloNormalizado = validarYNormalizarTitulo(titulo);
         Modulo modulo = obtenerModulo((long) moduloId);
+        int siguienteOrden = leccionRepository.listarPorModulo((long) moduloId).stream()
+                .mapToInt(Leccion::getOrden)
+                .max()
+                .orElse(0) + 1;
 
         Leccion nuevaLeccion = new Leccion();
         nuevaLeccion.setModulo(modulo);
         nuevaLeccion.setTitulo(tituloNormalizado);
         nuevaLeccion.setTieneContenido(false);
-        nuevaLeccion.setOrden(1);
+        nuevaLeccion.setOrden(siguienteOrden);
 
         leccionRepository.save(nuevaLeccion);
     }
@@ -124,21 +128,33 @@ public class LeccionService {
         if (leccionId == null) {
             throw new IllegalArgumentException("El ID de la lección a eliminar es obligatorio.");
         }
-        if (leccionRepository.findById(leccionId).isEmpty()) {
-            throw new IllegalArgumentException("La lección a eliminar no existe.");
-        }
+        Leccion leccion = leccionRepository.findById(leccionId)
+                .orElseThrow(() -> new IllegalArgumentException("La lección a eliminar no existe."));
+        List<Leccion> leccionesDelModulo = leccionRepository.listarPorModulo(leccion.getModulo().getId());
+
         leccionRepository.delete(leccionId);
+
+        int nuevoOrden = 1;
+        for (Leccion leccionRestante : leccionesDelModulo) {
+            if (leccionId.equals(leccionRestante.getId())) {
+                continue;
+            }
+            if (leccionRestante.getOrden() != nuevoOrden) {
+                leccionRepository.actualizarOrden(leccionRestante.getId(), nuevoOrden);
+            }
+            nuevoOrden++;
+        }
     }
 
     /**
      * Reordena una lección dentro de su módulo
      */
     public void reordenar(int leccionId, String direccion) {
-        if (direccion == null || (!"arriba".equalsIgnoreCase(direccion) && !"abajo".equalsIgnoreCase(direccion))) {
-            throw new IllegalArgumentException("La dirección debe ser 'arriba' o 'abajo'.");
+        if (direccion == null || (!"subir".equalsIgnoreCase(direccion) && !"bajar".equalsIgnoreCase(direccion))) {
+            throw new IllegalArgumentException("La dirección debe ser 'subir' o 'bajar'.");
         }
 
-        reordenarLeccion((long) leccionId, "arriba".equalsIgnoreCase(direccion) ? "SUBIR" : "BAJAR");
+        reordenarLeccion((long) leccionId, direccion);
     }
 
     /**
