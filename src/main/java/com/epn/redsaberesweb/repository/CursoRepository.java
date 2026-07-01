@@ -3,6 +3,7 @@ package com.epn.redsaberesweb.repository;
 import com.epn.redsaberesweb.domain.EstadoCurso;
 import com.epn.redsaberesweb.dto.CursoResumeDTO;
 import com.epn.redsaberesweb.models.Curso;
+import com.epn.redsaberesweb.models.Modulo;
 import org.hibernate.Session;
 import java.util.List;
 import java.util.Optional;
@@ -109,21 +110,23 @@ public class CursoRepository extends GenericRepositoryImpl<Curso, Long> {
     public List<CursoResumeDTO> findByEstado(EstadoCurso estado) {
         try (Session session = getSessionFactory().openSession()) {
             String hql = """
-                SELECT new com.epn.redsaberesweb.dto.CursoResumeDTO(
-                       c.titulo,
-                       c.categoria,
-                       c.descripcion,
-                       u.nombres,
-                       u.apellidos,
-                       count (m.id),
-                       count(l.id)
-                )
-                FROM Curso c
-                JOIN c.creador u
-                left JOIN c.modulos m
-                LEFT JOIN c.modulos l
-                WHERE c.estado = :estado
-                GROUP BY c.id, c.titulo, c.categoria, c.descripcion, u.nombres, u.apellidos, c.modulos
+            SELECT new com.epn.redsaberesweb.dto.CursoResumeDTO(
+                   c.id,
+                   c.titulo,
+                   c.categoria,
+                   c.descripcion,
+                   u.nombres,
+                   u.apellidos,
+                   count(DISTINCT m.id),
+                   count(DISTINCT l.id)
+            )
+            FROM Curso c
+            JOIN  c.creador  u
+            LEFT JOIN c.modulos  m
+            LEFT JOIN m.lecciones l
+            WHERE c.estado = :estado
+            GROUP BY c.id, c.titulo, c.categoria,
+                     c.descripcion, u.nombres, u.apellidos
             """;
             return session.createQuery(hql, CursoResumeDTO.class)
                     .setParameter("estado", estado)
@@ -137,15 +140,39 @@ public class CursoRepository extends GenericRepositoryImpl<Curso, Long> {
 
     public Optional<Curso> findPublicById(Long id) {
         try (Session session = getSessionFactory().openSession()) {
-            return session.createQuery(
-                            "SELECT c FROM Curso c " +
-                                    "LEFT JOIN FETCH c.modulos m " +
-                                    "LEFT JOIN FETCH m.lecciones " +  // carga lecciones en memoria
-                                    "LEFT JOIN FETCH c.creador " +
-                                    "WHERE c.id = :id AND c.estado = 'PUBLICADO'",
-                            Curso.class)
+
+            // ── Query 1: curso + módulos + creador ─────────────────────────────
+            // Solo un bag (c.modulos), no hay conflicto
+            Curso curso = session.createQuery("""
+                SELECT c FROM Curso c
+                LEFT JOIN FETCH c.modulos m
+                JOIN  FETCH c.creador
+                WHERE c.id     = :id
+                  AND c.estado = 'PUBLICADO'
+                ORDER BY m.orden ASC
+                """, Curso.class)
                     .setParameter("id", id)
-                    .uniqueResultOptional();
+                    .uniqueResult();
+
+            if (curso != null) {
+                // ── Query 2: lecciones de cada módulo ──────────────────────────
+                // Hibernate fusiona en la caché L1 → los módulos ya cargados
+                // reciben sus lecciones sin abrir otra Session
+                session.createQuery("""
+                    SELECT DISTINCT m FROM Modulo m
+                    LEFT JOIN FETCH m.lecciones l
+                    WHERE m.curso.id = :cursoId
+                    ORDER BY m.orden ASC, l.orden ASC
+                    """, Modulo.class)
+                        .setParameter("cursoId", id)
+                        .list(); // resultado descartado; solo importa el efecto en caché
+            }
+
+            return Optional.ofNullable(curso);
+
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error al obtener curso público ID: " + id, e);
+            throw new RuntimeException("No se pudo obtener el curso público.", e);
         }
     }
 

@@ -379,6 +379,11 @@
             background: #f8fafc;
         }
 
+        .preview-module-toggle:focus-visible {
+            outline: 3px solid rgba(1, 186, 239, .35);
+            outline-offset: -3px;
+        }
+
         .preview-module-number {
             width: 42px;
             height: 42px;
@@ -819,7 +824,7 @@
                                 <i data-lucide="calendar-days" aria-hidden="true"></i>
                                 <c:choose>
                                     <c:when test="${not empty requestScope.cursoEstructura.fechaCreacion()}">
-                                        <c:out value="${requestScope.cursoEstructura.fechaCreacion()}" />
+                                        <c:out value="${requestScope.cursoEstructura.fechaCreacion().toLocalDate()}" />
                                     </c:when>
                                     <c:otherwise>Fecha no disponible</c:otherwise>
                                 </c:choose>
@@ -918,6 +923,7 @@
                                     <article class="preview-module-card ${empty modulo.lecciones() or pendientesModulo gt 0
                                                      ? 'preview-module-has-pending' : ''}">
                                         <button type="button"
+                                                id="preview-module-toggle-${moduloStatus.index}"
                                                 class="preview-module-toggle"
                                                 aria-expanded="true"
                                                 aria-controls="preview-module-body-${moduloStatus.index}">
@@ -966,7 +972,10 @@
                                         </button>
 
                                         <div id="preview-module-body-${moduloStatus.index}"
-                                             class="preview-lessons-wrap">
+                                             class="preview-lessons-wrap"
+                                             role="region"
+                                             aria-labelledby="preview-module-toggle-${moduloStatus.index}"
+                                             aria-hidden="false">
                                             <div class="preview-lessons-inner">
                                                 <div class="preview-lessons-content">
                                                     <c:choose>
@@ -1079,7 +1088,11 @@
         toggle.addEventListener("click", function () {
             var moduleCard = toggle.closest(".preview-module-card");
             var isCollapsed = moduleCard.classList.toggle("collapsed");
+            var controlledRegion = document.getElementById(toggle.getAttribute("aria-controls"));
             toggle.setAttribute("aria-expanded", String(!isCollapsed));
+            if (controlledRegion) {
+                controlledRegion.setAttribute("aria-hidden", String(isCollapsed));
+            }
         });
     });
 

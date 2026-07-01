@@ -1,6 +1,9 @@
 package com.epn.redsaberesweb.servlet;
 
+import com.epn.redsaberesweb.domain.EstadoCurso;
 import com.epn.redsaberesweb.models.Curso;
+import com.epn.redsaberesweb.models.Leccion;
+import com.epn.redsaberesweb.models.Modulo;
 import com.epn.redsaberesweb.models.Usuario;
 import com.epn.redsaberesweb.service.CursoService;
 import jakarta.servlet.RequestDispatcher;
@@ -14,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.anyLong;
@@ -103,6 +107,64 @@ class PublicarCursoServletTest {
         validaErrorDeService("Existen lecciones sin contenido");
     }
 
+    @Test
+    void testDoGet_CursoYaPublicado_DebeSetearAtributosDeBotonDeshabilitado()
+            throws ServletException, IOException {
+        Long cursoId = 4L;
+        Curso curso = cursoDeCreador(10L);
+        curso.setEstado(EstadoCurso.PUBLICADO);
+        autenticarUsuario(10L);
+        when(request.getParameter("cursoId")).thenReturn(cursoId.toString());
+        when(cursoService.obtenerCurso(cursoId)).thenReturn(Optional.of(curso));
+        when(request.getRequestDispatcher("/WEB-INF/vistas/editar-curso.jsp")).thenReturn(dispatcher);
+
+        servlet.doGet(request, response);
+
+        verify(request).setAttribute("puedePublicar", false);
+        verify(request).setAttribute("mensajeBoton", "Curso publicado");
+        verify(request).setAttribute("curso", curso);
+        verify(dispatcher).forward(request, response);
+    }
+
+    @Test
+    void testDoGet_CursoBorradorEstructuraIncompleta_DebeSetearMensajeDeErrorEspecifico()
+            throws ServletException, IOException {
+        Long cursoId = 5L;
+        Curso curso = cursoDeCreador(10L);
+        curso.setEstado(EstadoCurso.BORRADOR);
+        curso.setModulos(List.of(moduloConLecciones()));
+        curso.getModulos().get(0).setLecciones(List.of(leccionConContenido(false)));
+        autenticarUsuario(10L);
+        when(request.getParameter("cursoId")).thenReturn(cursoId.toString());
+        when(cursoService.obtenerCurso(cursoId)).thenReturn(Optional.of(curso));
+        when(request.getRequestDispatcher("/WEB-INF/vistas/editar-curso.jsp")).thenReturn(dispatcher);
+
+        servlet.doGet(request, response);
+
+        verify(request).setAttribute("puedePublicar", false);
+        verify(request).setAttribute("mensajeBoton", "Todas las lecciones deben registrar contenido");
+        verify(dispatcher).forward(request, response);
+    }
+
+    @Test
+    void testDoGet_CursoBorradorEstructuraValida_DebeHabilitarBoton()
+            throws ServletException, IOException {
+        Long cursoId = 6L;
+        Curso curso = cursoDeCreador(10L);
+        curso.setEstado(EstadoCurso.BORRADOR);
+        curso.setModulos(List.of(moduloConLecciones(leccionConContenido(true))));
+        autenticarUsuario(10L);
+        when(request.getParameter("cursoId")).thenReturn(cursoId.toString());
+        when(cursoService.obtenerCurso(cursoId)).thenReturn(Optional.of(curso));
+        when(request.getRequestDispatcher("/WEB-INF/vistas/editar-curso.jsp")).thenReturn(dispatcher);
+
+        servlet.doGet(request, response);
+
+        verify(request).setAttribute("puedePublicar", true);
+        verify(request).setAttribute("mensajeBoton", "Publicar Curso");
+        verify(dispatcher).forward(request, response);
+    }
+
     private void validaErrorDeService(String mensaje) throws ServletException, IOException {
         Long cursoId = 3L;
         autenticarUsuario(10L);
@@ -128,5 +190,17 @@ class PublicarCursoServletTest {
         Curso curso = new Curso();
         curso.setCreador(creador);
         return curso;
+    }
+
+    private Modulo moduloConLecciones(Leccion... lecciones) {
+        Modulo modulo = new Modulo();
+        modulo.setLecciones(List.of(lecciones));
+        return modulo;
+    }
+
+    private Leccion leccionConContenido(boolean tieneContenido) {
+        Leccion leccion = new Leccion();
+        leccion.setTieneContenido(tieneContenido);
+        return leccion;
     }
 }

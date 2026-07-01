@@ -31,11 +31,35 @@
         }
 
         .detail-header h1 {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
             font-size: clamp(28px, 3vw, 38px);
             font-weight: 800;
             letter-spacing: -0.8px;
             color: var(--color-texto);
             margin-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.2;
+            padding: 4px 12px;
+            white-space: nowrap;
+        }
+
+        .badge-borrador {
+            background: #f1f3f5;
+            color: #495057;
+        }
+
+        .badge-publicado {
+            background: #d3f9d8;
+            color: #2b8a3e;
         }
 
         .detail-header p {
@@ -93,8 +117,38 @@
         }
 
         .back-button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
             margin-top: 40px;
-            text-align: center;
+        }
+
+        .publish-course-form {
+            margin: 0;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+            box-shadow: none;
+        }
+
+        .warning-box {
+            background: #fff9db;
+            border: 1px solid #ffe8cc;
+            border-radius: var(--radio-medio);
+            color: #856404;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.5;
+            margin-bottom: 24px;
+            padding: 16px;
+        }
+
+        .warning-box strong {
+            color: #d9480f;
         }
 
         @media (max-width: 640px) {
@@ -120,9 +174,26 @@
 
 <main class="course-detail-main">
     <c:if test="${not empty requestScope.curso}">
+        <c:if test="${requestScope.puedePublicar == false and requestScope.curso.estado() != 'PUBLICADO'}">
+            <div class="warning-box" role="alert">
+                <strong>Antes de publicar:</strong>
+                <c:out value="${requestScope.mensajeBoton}" />
+            </div>
+        </c:if>
+
         <div class="detail-card">
             <header class="detail-header">
-                <h1><c:out value="${requestScope.curso.titulo()}" /></h1>
+                <h1>
+                    <c:out value="${requestScope.curso.titulo()}" />
+                    <c:choose>
+                        <c:when test="${requestScope.curso.estado() == 'BORRADOR'}">
+                            <span class="status-badge badge-borrador">Borrador</span>
+                        </c:when>
+                        <c:when test="${requestScope.curso.estado() == 'PUBLICADO'}">
+                            <span class="status-badge badge-publicado">Publicado</span>
+                        </c:when>
+                    </c:choose>
+                </h1>
                 <p><c:out value="${requestScope.curso.descripcion()}" /></p>
             </header>
 
@@ -156,6 +227,22 @@
 
             <div class="back-button-container">
                 <button type="button" class="btn btn-secundario" onclick="window.history.back()">Volver</button>
+                <form class="publish-course-form" method="post" action="${pageContext.request.contextPath}/publicar-curso"
+                      onsubmit="return confirmarPublicacion(event)">
+                    <input type="hidden" name="cursoId" value="${requestScope.curso.id()}" />
+                    <c:choose>
+                        <c:when test="${requestScope.puedePublicar}">
+                            <button type="submit" class="btn btn-marca">
+                                <c:out value="${requestScope.mensajeBoton}" />
+                            </button>
+                        </c:when>
+                        <c:otherwise>
+                            <button type="submit" class="btn btn-secundario" disabled>
+                                <c:out value="${requestScope.mensajeBoton}" />
+                            </button>
+                        </c:otherwise>
+                    </c:choose>
+                </form>
             </div>
         </div>
     </c:if>
@@ -171,6 +258,15 @@
 </main>
 
 <script>
+    function confirmarPublicacion(event) {
+        var confirmado = confirm('¿Está seguro de publicar este curso? Una vez publicado será visible para todos los estudiantes de la plataforma.');
+        if (!confirmado) {
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    }
+
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }

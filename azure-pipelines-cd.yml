@@ -1,0 +1,91 @@
+trigger: none
+pr: none
+
+resources:
+  pipelines:
+    - pipeline: ci
+      source: RedSaberes-CI
+      trigger:
+        branches:
+          include:
+            - main
+
+variables:
+  azureSubscription: '5c9ce4a1-1594-40e0-a52e-7c93fd3796de'
+  webAppName: 'app-plataforma-jdta'
+  environmentName: 'app-plataforma-jdta'
+  vmImageName: 'ubuntu-latest'
+
+stages:
+
+  - stage: Migrate
+    jobs:
+      - job: FlywayMigrate
+
+        pool:
+          vmImage: $(vmImageName)
+
+        steps:
+
+          - checkout: self
+
+          - task: Maven@4
+            displayName: Flyway Info
+            inputs:
+              mavenPomFile: pom.xml
+              goals: flyway:info
+              javaHomeOption: JDKVersion
+              jdkVersionOption: '1.17'
+
+            env:
+              DB_URL: $(DB_URL)
+              DB_USER: $(DB_USER)
+              DB_PASSWORD: $(DB_PASSWORD)
+
+          - task: Maven@4
+            displayName: Flyway Migrate
+            inputs:
+              mavenPomFile: pom.xml
+              goals: flyway:migrate
+              javaHomeOption: JDKVersion
+              jdkVersionOption: '1.17'
+
+            env:
+              DB_URL: $(DB_URL)
+              DB_USER: $(DB_USER)
+              DB_PASSWORD: $(DB_PASSWORD)
+
+  - stage: Deploy
+
+    dependsOn: Migrate
+
+    jobs:
+
+      - deployment: DeployLinuxWebApp
+
+        environment: $(environmentName)
+
+        pool:
+          vmImage: $(vmImageName)
+
+        strategy:
+          runOnce:
+
+            deploy:
+
+              steps:
+
+                - download: ci
+                  artifact: drop
+
+                - script: |
+                    echo "Pipeline Workspace:"
+                    find $(Pipeline.Workspace) -type f
+                  displayName: 'Inspect Artifact'
+
+                - task: AzureWebApp@1
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    appType: webAppLinux
+                    appName: $(webAppName)
+                    package: '$(Pipeline.Workspace)/ci/drop/**/*.war'

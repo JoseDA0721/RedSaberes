@@ -1,0 +1,51 @@
+trigger:
+  branches:
+    include:
+    - develop
+
+pr:
+  branches:
+    include:
+      - main
+
+name: CI-$(Date:yyyyMMdd)-$(Rev:r)
+
+variables:
+  vmImageName: 'ubuntu-latest'
+
+stages:
+  - stage: Build
+    displayName: Build and Test
+
+    jobs:
+      - job: Build
+        pool:
+          vmImage: $(vmImageName)
+
+        steps:
+
+          - task: Maven@4
+            displayName: Maven Build
+            inputs:
+              mavenPomFile: 'pom.xml'
+              mavenOptions: '-Xmx3072m'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              goals: 'clean verify'
+
+          - task: CopyFiles@2
+            displayName: Copy WAR
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)'
+              Contents: '**/target/*.war'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Artifact
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)'
+              artifact: 'drop'
+        

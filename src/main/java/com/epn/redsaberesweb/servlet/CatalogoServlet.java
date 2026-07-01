@@ -1,7 +1,6 @@
 package com.epn.redsaberesweb.servlet;
 
 import com.epn.redsaberesweb.dto.CursoResumeDTO;
-import com.epn.redsaberesweb.models.Curso;
 import com.epn.redsaberesweb.repository.CursoRepository;
 import com.epn.redsaberesweb.service.CursoService;
 import jakarta.servlet.ServletException;
@@ -26,9 +25,13 @@ public class CatalogoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        // No requiere sesión — es vista pública
+
         List<CursoResumeDTO> cursos = cursoService.listarCursosPublicados();
-        req.setAttribute("cursos", cursos);
-        req.getRequestDispatcher("/WEB-INF/vistas/catalogo.jsp").forward(req, res);
+
+        req.setAttribute("cursos",        cursos);
+        req.setAttribute("totalCursos",   cursos.size());
+
+        req.getRequestDispatcher("/WEB-INF/vistas/catalogo.jsp")
+                .forward(req, res);
     }
 }

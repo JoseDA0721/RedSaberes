@@ -1,0 +1,54 @@
+target/
+*.class
+
+!.mvn/wrapper/maven-wrapper.jar
+
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+.kotlin
+
+### IntelliJ ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### macOS ###
+.DS_Store
+
+### SQLite ###
+.redsaberes/
+*.db
+
+### Logs ###
+*.log
+
+### Tomcat ###
+.smarttomcat/
+out/
+
+### Local Config ###
+config-local.properties
+application-local.properties
